@@ -1,0 +1,26 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:api": "node src/api.js",
+    "start:server": "node src/server.js",
+    "lint:check": "npx eslint src/",
+    "lint": "npx eslint src/ --fix",
+    "prettier": "npx prettier --write src/",
+    "prettier:check": "npx prettier --check src/"
+  },
+  "keywords": [],
+  "author": "Kathund",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "eslint-plugin-import": "^2.28.1",
+    "prettier": "^3.0.3"
+  }
+}

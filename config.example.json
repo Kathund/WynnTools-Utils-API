@@ -1,0 +1,12 @@
+{
+  "ticketFolder": "../tickets",
+  "logsFolder": "../logs",
+  "timezone": null,
+  "api": {
+    "key": "UUID_V4_KEY",
+    "PORT": "PORT_FOR_API"
+  },
+  "server": {
+    "PORT": "PORT_FOR_SERVER"
+  }
+}
