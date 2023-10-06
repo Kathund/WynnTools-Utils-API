@@ -11,12 +11,15 @@ module.exports = (app) => {
     try {
       if (!apiKey(req.headers)) {
         apiMessage(
-          '/v1/transcript/get',
-          `has been triggered by ${req.ip} using key ${req.headers.key} but the key was invalid`
+          '/v1/transcript/save',
+          `has been triggered by ${req.socket.remoteAddress} using key ${req.headers.key} but the key was invalid`
         );
         return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
       }
-      apiMessage('/v1/transcript/save ', `has been triggered by ${req.ip} using key ${req.headers.key}`);
+      apiMessage(
+        '/v1/transcript/save',
+        `has been triggered by ${req.socket.remoteAddress} using key ${req.headers.key}`
+      );
       const transcript = req.body;
       if (!transcript) {
         return res.status(400).send({ success: false, cause: 'No transcript provided' });

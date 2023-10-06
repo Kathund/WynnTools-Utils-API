@@ -9,17 +9,17 @@ module.exports = (app) => {
     if (!apiKey(req.headers)) {
       apiMessage(
         '/v1/transcript/get',
-        `has been triggered by ${req.ip} using key ${req.headers.key} but the key was invalid`
+        `has been triggered by ${req.socket.remoteAddress} using key ${req.headers.key} but the key was invalid`
       );
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
     const ticketId = req.query.id;
     apiMessage(
       '/v1/transcript/get',
-      `has been triggered by ${req.ip} using key ${req.headers.key} fetching ticket ${ticketId}`
+      `has been triggered by ${req.socket.remoteAddress} using key ${req.headers.key} fetching ticket ${ticketId}`
     );
     if (!ticketId) {
-      errorMessage(`No ticketId provided by ${req.ip}`);
+      errorMessage(`No ticketId provided by ${req.socket.remoteAddress}`);
       return res.status(400).send({ success: false, cause: 'No ticketId provided' });
     }
     fs.readFile(path.join(path.join(__dirname, config.ticketFolder), `${ticketId}.txt`), 'utf8', function (err, data) {
@@ -27,7 +27,10 @@ module.exports = (app) => {
         errorMessage(`Error viewing transcript ${ticketId}: ${err}`);
         return res.status(404).send({ success: false, cause: 'No transcript found' });
       }
-      apiMessage('/v1/transcript/get', `Transcript for ticket ${ticketId} has been sent to ${req.ip}`);
+      apiMessage(
+        '/v1/transcript/get',
+        `Transcript for ticket ${ticketId} has been sent to ${req.socket.remoteAddress}`
+      );
       return res.status(200).send({ success: true, info: data });
     });
   });
