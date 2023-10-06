@@ -12,13 +12,13 @@ module.exports = (app) => {
       if (!apiKey(req.headers)) {
         apiMessage(
           '/v1/transcript/save',
-          `has been triggered by ${req.socket.remoteAddress} using key ${req.headers.key} but the key was invalid`
+          `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key} but the key was invalid`
         );
         return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
       }
       apiMessage(
         '/v1/transcript/save',
-        `has been triggered by ${req.socket.remoteAddress} using key ${req.headers.key}`
+        `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`
       );
       const transcript = req.body;
       if (!transcript) {
