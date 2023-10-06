@@ -1,5 +1,5 @@
 // Credits https://github.com/DuckySoLucky/hypixel-error-chat-bridge/blob/f8a8a8e1e1c469127b8fcd03e6553b43f22b8250/src/Logger.js (Edited)
-const customLevels = { api: 0, server: 1, error: 2, warn: 3, other: 4, max: 5 };
+const customLevels = { api: 0, error: 1, warn: 2, other: 3, max: 4 };
 const config = require('../config.json');
 const winston = require('winston');
 const path = require('path');
@@ -40,26 +40,6 @@ const apiLogger = winston.createLogger({
   ),
   transports: [
     new winston.transports.File({ name: 'cache', filename: path.join(logDirectory, 'api.log'), level: 'api' }),
-    new winston.transports.File({ name: 'combined', filename: path.join(logDirectory, 'combined.log'), level: 'max' }),
-    new winston.transports.Console({ levels: 'max' }),
-  ],
-});
-
-const serverLogger = winston.createLogger({
-  level: 'server',
-  levels: customLevels,
-  format: winston.format.combine(
-    winston.format.timestamp({ format: timezone }),
-    winston.format.printf(({ timestamp, level, message }) => {
-      return `[${timestamp}] ${level.toUpperCase()} > ${message}`;
-    })
-  ),
-  transports: [
-    new winston.transports.File({
-      name: 'server',
-      filename: path.join(logDirectory, 'server.log'),
-      level: 'server',
-    }),
     new winston.transports.File({ name: 'combined', filename: path.join(logDirectory, 'combined.log'), level: 'max' }),
     new winston.transports.Console({ levels: 'max' }),
   ],
@@ -118,11 +98,8 @@ const otherLogger = winston.createLogger({
 });
 
 const logger = {
-  api: (params) => {
-    return apiLogger.api(params);
-  },
-  server: (params) => {
-    return serverLogger.server(params);
+  api: (...args) => {
+    return apiLogger.api(args.join(' | '));
   },
   error: (params) => {
     return errorLogger.error(params);
@@ -137,7 +114,6 @@ const logger = {
 
 module.exports = {
   apiMessage: logger.api,
-  serverMessage: logger.server,
   errorMessage: logger.error,
   warnMessage: logger.warn,
   otherMessage: logger.other,
