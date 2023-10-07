@@ -25,7 +25,7 @@ const timezone = () => {
       minute: 'numeric',
       second: 'numeric',
       hour12: false,
-      timeZone: config.other.timezone,
+      timeZone: config.timezone,
     });
   }
 };
