@@ -21,9 +21,10 @@ try {
         continue;
       }
       loaded++;
-      const route = require(path.join(endpointsPath, endpoint));
+      const endpointPath = path.join(endpointsPath, endpoint);
+      const route = require(endpointPath);
       route(app);
-      otherMessage(`Loaded ${endpoint.split('.js')[0]} endpoint`);
+      otherMessage(`Loaded ${endpointPath.split('/src/endpoints/')[1].split('.js')[0]} endpoint`);
     }
   }
   otherMessage(`Loaded ${loaded} endpoints, skipped ${skipped} endpoints`);

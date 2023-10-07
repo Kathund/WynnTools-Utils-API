@@ -38,6 +38,24 @@ module.exports = (app) => {
             errorMessage(`Error saving transcript ${transcript.ticket.id}: ${err}`);
             return res.status(500).send({ success: false, cause: 'Error saving transcript' });
           }
+          const userData = JSON.parse(fs.readFileSync('userData.json', 'utf8'));
+          try {
+            if (userData[transcript.ticket.opened.by.id]) {
+              var userTickets = userData[transcript.ticket.opened.by.id].tickets;
+              userTickets.push(transcript.ticket.id);
+              userData[transcript.ticket.opened.by.id].tickets = userTickets;
+            } else {
+              userData[transcript.ticket.opened.by.id] = {
+                id: transcript.ticket.opened.by.id,
+                username: transcript.ticket.opened.by.username,
+                admin: false,
+                tickets: [transcript.ticket.id],
+              };
+            }
+            fs.writeFileSync('userData.json', JSON.stringify(userData));
+          } catch (error) {
+            errorMessage(`Error saving user data for ${transcript.ticket.opened.by.id}: ${error}`);
+          }
           apiMessage('/v1/transcript/save', `Transcript for ticket ${transcript.ticket.id} has been saved`);
           return res.status(201).send({ success: true, info: 'Transcript saved' });
         }
