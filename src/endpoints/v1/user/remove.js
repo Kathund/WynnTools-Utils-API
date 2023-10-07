@@ -30,7 +30,7 @@ module.exports = (app) => {
         fs.writeFileSync('userData.json', JSON.stringify(userData));
         apiMessage(
           '/v1/user/remove',
-          `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key} and user ${userId} has been`
+          `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key} and user ${userId} has been removed`
         );
         return res.status(200).send({ success: true, info: `${userId} has been removed from the database` });
       }
