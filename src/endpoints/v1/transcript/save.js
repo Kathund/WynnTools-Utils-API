@@ -24,8 +24,7 @@ module.exports = (app) => {
       if (!transcript) {
         return res.status(400).send({ success: false, cause: 'No transcript provided' });
       }
-      var msgSplit = '------------------------------------------------------------';
-      var msgStr = `Ticket Id: ${transcript.ticket.id}\n${msgSplit}\nTicket Opened by: ${transcript.ticket.opened.by.username} (${transcript.ticket.opened.by.id})\nOpen Reason: ${transcript.ticket.opened.reason}\nTimestamp: ${transcript.ticket.opened.timestamp}\n\nTicket Closed By: ${transcript.ticket.closed.by.username} (${transcript.ticket.closed.by.id})\nClose Reason: ${transcript.ticket.closed.reason}\nTimestamp: ${transcript.ticket.closed.timestamp}\n${msgSplit}\n\nMessages:\n`;
+      var msgStr = `Ticket Id: ${transcript.ticket.id}\n${config.msgSplit}\nTicket Opened by: ${transcript.ticket.opened.by.username} (${transcript.ticket.opened.by.id})\nOpen Reason: ${transcript.ticket.opened.reason}\nTimestamp: ${transcript.ticket.opened.timestamp}\n\nTicket Closed By: ${transcript.ticket.closed.by.username} (${transcript.ticket.closed.by.id})\nClose Reason: ${transcript.ticket.closed.reason}\nTimestamp: ${transcript.ticket.closed.timestamp}\n${config.msgSplit}\n\nMessages:\n`;
       transcript.messages.forEach((message) => {
         msgStr += `${message.username} (${message.user}) @ ${message.timestamp}: ${message.content}\n`;
       });

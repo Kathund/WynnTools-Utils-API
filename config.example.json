@@ -1,4 +1,5 @@
 {
+  "msgSplit": "------------------------------------------------------------",
   "ticketFolder": "../../../../tickets",
   "logsFolder": "../logs",
   "timezone": null,
