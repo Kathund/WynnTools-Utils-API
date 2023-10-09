@@ -1,5 +1,5 @@
-const { errorMessage, apiMessage } = require('../../../logger.js');
-const config = require('../../../../config.json');
+const { errorMessage, apiMessage } = require('../../logger.js');
+const config = require('../../../config.json');
 const path = require('path');
 const fs = require('fs');
 
@@ -7,15 +7,24 @@ module.exports = (app) => {
   app.get('/:file.txt', (req, res) => {
     apiMessage('/:file.txt', `File ${req.params.file} was requested by ${req.headers['x-forwarded-for']}`);
     const requestedFileName = req.params.file;
-    const id = req.query.id;
+    const { userData, oauthData } = req.session;
+    if (!userData || !oauthData) {
+      req.session.ticketId = requestedFileName;
+      return res.redirect(config.discord.url);
+    }
+    if (userData.id !== oauthData.id) {
+      req.session.ticketId = requestedFileName;
+      return res.redirect(config.discord.url);
+    }
+    const id = userData.id;
     if (!id) return res.status(400).end('You are missing an id');
-    var userData = JSON.parse(fs.readFileSync('userData.json', 'utf8'));
-    if (!userData[id]) {
+    var userInfo = JSON.parse(fs.readFileSync('userData.json', 'utf8'));
+    if (!userInfo[id]) {
       errorMessage(`file ${id} was not found - Requested by ${req.headers['x-forwarded-for']}`);
       return res.status(400).end('You do not have access to this file');
     }
-    if (userData[id].tickets.includes(requestedFileName) || userData[id].admin) {
-      const filePath = path.join(path.join(__dirname, config.ticketFolder), `${requestedFileName}.txt`);
+    if (userInfo[id].tickets.includes(requestedFileName) || userInfo[id].admin) {
+      const filePath = path.join(path.join(__dirname, '../../../tickets'), `${requestedFileName}.txt`);
       fs.stat(filePath, (err, stats) => {
         if (err || !stats.isFile() || path.extname(filePath) !== '.txt') {
           errorMessage(

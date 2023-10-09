@@ -1,10 +1,15 @@
 {
   "msgSplit": "------------------------------------------------------------",
-  "ticketFolder": "../../../../tickets",
   "logsFolder": "../logs",
   "timezone": null,
+  "sessionSecret": "SESSION_SECRET_KEY",
+  "discord": {
+    "url": "DISCORD_OAUTH_URL",
+    "clientId": "DISCORD_OAUTH_CLIENT_ID",
+    "clientSecret": "DISCORD_OAUTH_CLIENT_SECRET"
+  },
   "api": {
-    "key": "UUID_V4_KEY",
-    "PORT": "PORT_FOR_API"
+    "key": "API_KEY",
+    "PORT": 1337
   }
 }

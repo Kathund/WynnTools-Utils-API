@@ -1,5 +1,4 @@
 const { errorMessage, apiMessage } = require('../../../logger.js');
-const config = require('../../../../config.json');
 const { apiKey } = require('../../../apiKey.js');
 const path = require('path');
 const fs = require('fs');
@@ -14,7 +13,7 @@ module.exports = (app) => {
       );
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
-    fs.readdir(path.join(__dirname, config.ticketFolder), (err, files) => {
+    fs.readdir(path.join(__dirname, '../../../../tickets'), (err, files) => {
       if (err) {
         errorMessage(`/v1/transcript/list ${err}`);
         return res.status(500).json({ success: false, cause: 'Internal Server Error' });

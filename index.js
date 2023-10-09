@@ -1,37 +1,23 @@
 const { errorMessage, otherMessage } = require('./src/logger.js');
+const { loadEndpoints } = require('./src/loadEndpoints.js');
 const config = require('./config.json');
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+
+const app = express();
 
 try {
-  const app = express();
-  const endpointsDir = path.join(__dirname, 'src', 'endpoints', 'v1');
-  errorMessage(endpointsDir);
+  app.get('/', async (req, res) => {
+    return res.redirect(config.discord.url);
+  });
 
-  var skipped = 0;
-  var loaded = 0;
-  const endpointFolders = fs.readdirSync(endpointsDir);
-  for (const folder of endpointFolders) {
-    const endpointsPath = path.join(endpointsDir, folder);
-    const endpoints = fs.readdirSync(endpointsPath).filter((file) => file.endsWith('.js'));
-    for (const endpoint of endpoints) {
-      if (endpoint.toLowerCase().includes('disabled')) {
-        skipped++;
-        continue;
-      }
-      loaded++;
-      const endpointPath = path.join(endpointsPath, endpoint);
-      const route = require(endpointPath);
-      route(app);
-      otherMessage(`Loaded ${endpointPath.split('/src/endpoints/')[1].split('.js')[0]} endpoint`);
-    }
-  }
-  otherMessage(`Loaded ${loaded} endpoints, skipped ${skipped} endpoints`);
+  const endpointsDir = path.join(__dirname, 'src', 'endpoints');
+  const result = loadEndpoints(endpointsDir, app);
+  otherMessage(`Loaded ${result.loaded} endpoints, skipped ${result.skipped} endpoints`);
 
   app.listen(config.api.PORT, () => {
     otherMessage(`Server started on port ${config.api.PORT} @ http://localhost:${config.api.PORT}`);
   });
 } catch (error) {
-  errorMessage(error);
+  errorMessage(`Error starting server: ${error}`);
 }

@@ -1,5 +1,4 @@
 const { errorMessage, apiMessage } = require('../../../logger.js');
-const config = require('../../../../config.json');
 const { apiKey } = require('../../../apiKey.js');
 const path = require('path');
 const fs = require('fs');
@@ -22,16 +21,20 @@ module.exports = (app) => {
       errorMessage(`No ticketId provided by ${req.headers['x-forwarded-for']}`);
       return res.status(400).send({ success: false, cause: 'No ticketId provided' });
     }
-    fs.readFile(path.join(path.join(__dirname, config.ticketFolder), `${ticketId}.txt`), 'utf8', function (err, data) {
-      if (err) {
-        errorMessage(`Error viewing transcript ${ticketId}: ${err}`);
-        return res.status(404).send({ success: false, cause: 'No transcript found' });
+    fs.readFile(
+      path.join(path.join(__dirname, '../../../../tickets'), `${ticketId}.txt`),
+      'utf8',
+      function (err, data) {
+        if (err) {
+          errorMessage(`Error viewing transcript ${ticketId}: ${err}`);
+          return res.status(404).send({ success: false, cause: 'No transcript found' });
+        }
+        apiMessage(
+          '/v1/transcript/get',
+          `Transcript for ticket ${ticketId} has been sent to ${req.headers['x-forwarded-for']}`
+        );
+        return res.status(200).send({ success: true, info: data });
       }
-      apiMessage(
-        '/v1/transcript/get',
-        `Transcript for ticket ${ticketId} has been sent to ${req.headers['x-forwarded-for']}`
-      );
-      return res.status(200).send({ success: true, info: data });
-    });
+    );
   });
 };

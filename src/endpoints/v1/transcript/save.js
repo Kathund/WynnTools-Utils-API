@@ -24,7 +24,7 @@ module.exports = (app) => {
       if (!transcript) {
         return res.status(400).send({ success: false, cause: 'No transcript provided' });
       }
-      fs.readdir(path.join(__dirname, config.ticketFolder), (err, files) => {
+      fs.readdir(path.join(__dirname, '../../../../tickets'), (err, files) => {
         if (err) {
           errorMessage(`/v1/transcript/list ${err}`);
           return res.status(500).json({ success: false, cause: 'Internal Server Error' });
@@ -41,7 +41,7 @@ module.exports = (app) => {
         });
 
         fs.writeFile(
-          path.join(path.join(__dirname, config.ticketFolder), `${transcript.ticket.id}.txt`),
+          path.join(path.join(__dirname, '../../../../tickets'), `${transcript.ticket.id}.txt`),
           msgStr,
           function (err) {
             if (err) {

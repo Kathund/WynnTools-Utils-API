@@ -1,21 +1,21 @@
 {
-  "name": "api",
+  "name": "wynntools-utils-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:api": "node src/api.js",
-    "start:server": "node src/server.js",
-    "lint:check": "npx eslint src/",
-    "lint": "npx eslint src/ --fix",
-    "prettier": "npx prettier --write src/",
-    "prettier:check": "npx prettier --check src/"
+    "lint:check": "npx eslint src/ index.js",
+    "lint": "npx eslint src/ index.js --fix",
+    "prettier": "npx prettier --write src/ index.js",
+    "prettier:check": "npx prettier --check src/ index.js"
   },
   "keywords": [],
   "author": "Kathund",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.5.1",
     "express": "^4.18.2",
+    "express-session": "^1.17.3",
     "winston": "^3.10.0"
   },
   "devDependencies": {

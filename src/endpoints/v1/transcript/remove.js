@@ -1,5 +1,4 @@
 const { errorMessage, apiMessage } = require('../../../logger.js');
-const config = require('../../../../config.json');
 const { apiKey } = require('../../../apiKey.js');
 const path = require('path');
 const fs = require('fs');
@@ -27,7 +26,7 @@ module.exports = (app) => {
         `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key} removing ticket ${ticketId}`
       );
       if (!ticketId) return res.status(400).send({ success: false, cause: 'No ticket id provided' });
-      fs.readdir(path.join(__dirname, config.ticketFolder), (err, files) => {
+      fs.readdir(path.join(__dirname, '../../../../'), (err, files) => {
         if (err) {
           errorMessage(`/v1/transcript/remove ${err}`);
           return res.status(500).json({ success: false, cause: 'Internal Server Error' });
@@ -36,7 +35,7 @@ module.exports = (app) => {
           return file.replace('.txt', '');
         });
         if (files.includes(ticketId)) {
-          fs.unlinkSync(path.join(__dirname, config.ticketFolder, `${ticketId}.txt`));
+          fs.unlinkSync(path.join(__dirname, '../../../../tickets', `${ticketId}.txt`));
           return res.status(200).send({ success: true, info: `${ticketId} has been removed from the database` });
         } else {
           apiMessage(
