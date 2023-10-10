@@ -4,6 +4,7 @@
   "timezone": null,
   "sessionSecret": "SESSION_SECRET_KEY",
   "discord": {
+    "redirectUrl": "DISCORD_OAUTH_REDIRECT_URL",
     "url": "DISCORD_OAUTH_URL",
     "clientId": "DISCORD_OAUTH_CLIENT_ID",
     "clientSecret": "DISCORD_OAUTH_CLIENT_SECRET"
