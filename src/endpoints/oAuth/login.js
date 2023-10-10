@@ -27,7 +27,7 @@ module.exports = (app) => {
               client_secret: config.discord.clientSecret,
               code,
               grant_type: 'authorization_code',
-              redirect_uri: `http://${config.discord.redirectUrl}/oAuth/login`,
+              redirect_uri: config.discord.redirectUrl,
               scope: 'identify',
             }).toString(),
             headers: {
