@@ -1,5 +1,5 @@
 type user = { username: string; token_type: string; access_token: string; id?: string };
-import { apiMessage, errorMessage } from '../../../logger.js';
+import { apiMessage, errorMessage } from '../../../logger';
 import { sessionSecret, discord } from '../../../../config.json';
 import session from 'express-session';
 import { json } from 'body-parser';
@@ -31,7 +31,7 @@ export default (app: any) => {
             authorization: `${oauthData.token_type} ${oauthData.access_token}`,
           },
         });
-        var user = (await userResult.body.json()) as user;
+        const user = (await userResult.body.json()) as user;
         req.session.userData = user;
         req.session.oauthData['id'] = user.id;
         req.session.oauthData['username'] = user.username;

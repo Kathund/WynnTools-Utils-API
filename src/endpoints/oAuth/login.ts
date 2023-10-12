@@ -35,7 +35,7 @@ export default (app: any) => {
               'Content-Type': 'application/x-www-form-urlencoded',
             },
           });
-          var oauthData = (await tokenResponseData.body.json()) as oauthData;
+          const oauthData = (await tokenResponseData.body.json()) as oauthData;
           req.session.oauthData = oauthData;
 
           const userResult = await request('https://discord.com/api/users/@me', {

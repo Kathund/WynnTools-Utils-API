@@ -24,9 +24,10 @@ export const loadEndpoints = (directory: string, app: any) => {
           continue;
         }
         loaded++;
+        // eslint-disable-next-line
         const route = require(itemPath).default;
         route(app);
-        otherMessage(`Loaded ${itemPath.split('\\src\\endpoints\\')[1].split('.ts')[0]} endpoint`);
+        otherMessage(`Loaded ${itemPath.split('/src/endpoints/')[1].split('.ts')[0]} endpoint`);
       }
     }
     return { loaded, skipped };

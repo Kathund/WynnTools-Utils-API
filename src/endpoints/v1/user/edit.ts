@@ -1,6 +1,6 @@
-import { errorMessage, apiMessage } from '../../../logger.js';
+import { errorMessage, apiMessage } from '../../../logger';
 import { readFileSync, writeFileSync } from 'fs';
-import { apiKey } from '../../../apiKey.js';
+import { apiKey } from '../../../apiKey';
 import { json } from 'express';
 
 export default (app: any) => {
@@ -20,9 +20,9 @@ export default (app: any) => {
       );
       const userId = req.query.id;
       if (!userId) return res.status(400).send({ success: false, cause: 'No user id provided' });
-      var userData = JSON.parse(readFileSync('userData.json', 'utf8'));
+      const userData = JSON.parse(readFileSync('userData.json', 'utf8'));
       if (userData[userId]) {
-        var newData = req.body;
+        const newData = req.body;
         if (!newData) {
           return res.status(400).send({ success: false, cause: 'No user data provided' });
         }

@@ -1,8 +1,8 @@
 type message = { username: string; id: string; timestamp: number; content: string; avatar: string };
 import { readdir, writeFile, readFileSync, writeFileSync } from 'fs';
-import { errorMessage, apiMessage } from '../../../logger.js';
+import { errorMessage, apiMessage } from '../../../logger';
 import { msgSplit } from '../../../../config.json';
-import { apiKey } from '../../../apiKey.js';
+import { apiKey } from '../../../apiKey';
 import { json } from 'express';
 import { join } from 'path';
 
@@ -36,7 +36,7 @@ export default (app: any) => {
         if (files.includes(transcript.ticket.id)) {
           return res.status(409).send({ success: false, cause: 'Transcript already exists' });
         }
-        var msgStr = `Ticket Id: ${transcript.ticket.id}\n${msgSplit}\nTicket Opened by: ${transcript.ticket.opened.by.username} (${transcript.ticket.opened.by.id})\nOpen Reason: ${transcript.ticket.opened.reason}\nTimestamp: ${transcript.ticket.opened.timestamp}\n\nTicket Closed By: ${transcript.ticket.closed.by.username} (${transcript.ticket.closed.by.id})\nClose Reason: ${transcript.ticket.closed.reason}\nTimestamp: ${transcript.ticket.closed.timestamp}\n${msgSplit}\n\nMessages:\n`;
+        let msgStr = `Ticket Id: ${transcript.ticket.id}\n${msgSplit}\nTicket Opened by: ${transcript.ticket.opened.by.username} (${transcript.ticket.opened.by.id})\nOpen Reason: ${transcript.ticket.opened.reason}\nTimestamp: ${transcript.ticket.opened.timestamp}\n\nTicket Closed By: ${transcript.ticket.closed.by.username} (${transcript.ticket.closed.by.id})\nClose Reason: ${transcript.ticket.closed.reason}\nTimestamp: ${transcript.ticket.closed.timestamp}\n${msgSplit}\n\nMessages:\n`;
         transcript.messages.forEach((message: message) => {
           msgStr += `${message.username} (${message.id}) @ ${message.timestamp}: ${message.content}\n`;
         });
@@ -49,7 +49,7 @@ export default (app: any) => {
           const userData = JSON.parse(readFileSync('userData.json', 'utf8'));
           try {
             if (userData[transcript.ticket.opened.by.id]) {
-              var userTickets = userData[transcript.ticket.opened.by.id].tickets;
+              const userTickets = userData[transcript.ticket.opened.by.id].tickets;
               userTickets.push(transcript.ticket.id);
               userData[transcript.ticket.opened.by.id].tickets = userTickets;
             } else {

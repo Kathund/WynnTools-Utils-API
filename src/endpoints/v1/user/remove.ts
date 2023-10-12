@@ -1,6 +1,6 @@
-import { errorMessage, apiMessage } from '../../../logger.js';
+import { errorMessage, apiMessage } from '../../../logger';
 import { readFileSync, writeFileSync } from 'fs';
-import { apiKey } from '../../../apiKey.js';
+import { apiKey } from '../../../apiKey';
 
 export default (app: any) => {
   app.delete('/v1/user/remove', async (req: any, res: any) => {

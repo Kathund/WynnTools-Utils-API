@@ -18,7 +18,7 @@ export default (app: any) => {
     }
     const id = userData.id;
     if (!id) return res.status(400).end('You are missing an id');
-    var userInfo = JSON.parse(readFileSync('userData.json', 'utf8'));
+    const userInfo = JSON.parse(readFileSync('userData.json', 'utf8'));
     if (!userInfo[id]) {
       errorMessage(`file ${id} was not found - Requested by ${req.headers['x-forwarded-for']}`);
       return res.status(400).end('You do not have access to this file');

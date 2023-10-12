@@ -1,5 +1,5 @@
-import { errorMessage, apiMessage } from '../../../logger.js';
-import { apiKey } from '../../../apiKey.js';
+import { errorMessage, apiMessage } from '../../../logger';
+import { apiKey } from '../../../apiKey';
 import { readdir, unlinkSync } from 'fs';
 import { join } from 'path';
 
@@ -16,7 +16,7 @@ export default (app: any) => {
       );
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
-    var ticketId = req.query.id;
+    let ticketId = req.query.id;
     if (ticketId.includes('.txt')) {
       ticketId = ticketId.replace('.txt', '');
     }

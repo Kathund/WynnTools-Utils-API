@@ -1,5 +1,5 @@
-import { errorMessage, apiMessage } from '../../../logger.js';
-import { apiKey } from '../../../apiKey.js';
+import { errorMessage, apiMessage } from '../../../logger';
+import { apiKey } from '../../../apiKey';
 import { readFileSync } from 'fs';
 
 export default (app: any) => {

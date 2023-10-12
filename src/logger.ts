@@ -1,6 +1,5 @@
 const customLevels = { api: 0, error: 1, warn: 2, other: 3, max: 4 };
 import { createLogger, format, transports } from 'winston';
-import { join } from 'path';
 
 const timezone = () => {
   return new Date().toLocaleString('en-US', {

@@ -1,4 +1,4 @@
-import { errorMessage, apiMessage } from '../../logger.js';
+import { errorMessage, apiMessage } from '../../logger';
 import { sessionSecret } from '../../../config.json';
 import session from 'express-session';
 import { json } from 'body-parser';

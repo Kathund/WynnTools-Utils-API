@@ -1,5 +1,5 @@
 import { sessionSecret, discord } from '../../../../config.json';
-import { apiMessage, errorMessage } from '../../../logger.js';
+import { apiMessage, errorMessage } from '../../../logger';
 import session from 'express-session';
 import { json } from 'body-parser';
 import { readFileSync } from 'fs';
