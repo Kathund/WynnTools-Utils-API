@@ -2,8 +2,8 @@ import { errorMessage, apiMessage } from '../../../logger.js';
 import { apiKey } from '../../../apiKey.js';
 import { readFileSync } from 'fs';
 
-export default (app) => {
-  app.get('/v1/user/list', async (req, res) => {
+export default (app: any) => {
+  app.get('/v1/user/list', async (req: any, res: any) => {
     apiMessage('/v1/user/list', `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`);
     if (!apiKey(req.headers)) {
       apiMessage(
@@ -16,7 +16,7 @@ export default (app) => {
       const userData = JSON.parse(readFileSync('userData.json', 'utf8'));
       const keys = Object.keys(userData);
       return res.status(200).send({ success: true, info: keys });
-    } catch (error) {
+    } catch (error: any) {
       errorMessage(error);
       return res.status(500).send({ success: false, cause: 'Internal Server Error' });
     }

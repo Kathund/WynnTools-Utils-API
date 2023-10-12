@@ -3,8 +3,8 @@ import { apiKey } from '../../../apiKey.js';
 import { readdir, unlinkSync } from 'fs';
 import { join } from 'path';
 
-export default (app) => {
-  app.delete('/v1/transcript/remove', async (req, res) => {
+export default (app: any) => {
+  app.delete('/v1/transcript/remove', async (req: any, res: any) => {
     apiMessage(
       '/v1/transcript/remove',
       `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`
@@ -45,7 +45,7 @@ export default (app) => {
           return res.status(404).send({ success: false, cause: 'User not found' });
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       errorMessage(`Error fetching user ${ticketId}: ${error}`);
       return res.status(500).send({ success: false, cause: 'Internal Server Error' });
     }

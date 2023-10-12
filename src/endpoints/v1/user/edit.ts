@@ -3,9 +3,9 @@ import { readFileSync, writeFileSync } from 'fs';
 import { apiKey } from '../../../apiKey.js';
 import { json } from 'express';
 
-export default (app) => {
+export default (app: any) => {
   app.use(json());
-  app.patch('/v1/user/edit', async (req, res) => {
+  app.patch('/v1/user/edit', async (req: any, res: any) => {
     try {
       if (!apiKey(req.headers)) {
         apiMessage(
@@ -32,7 +32,7 @@ export default (app) => {
       } else {
         return res.status(404).send({ success: false, cause: 'User not found' });
       }
-    } catch (error) {
+    } catch (error: any) {
       errorMessage(error);
       return res.status(500).send({ success: false, cause: 'Internal server error' });
     }

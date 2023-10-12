@@ -1,13 +1,14 @@
+type message = { username: string; id: string; timestamp: number; content: string; avatar: string };
 import { readdir, writeFile, readFileSync, writeFileSync } from 'fs';
 import { errorMessage, apiMessage } from '../../../logger.js';
-import { other } from '../../../config.js';
+import { msgSplit } from '../../../../config.json';
 import { apiKey } from '../../../apiKey.js';
 import { json } from 'express';
 import { join } from 'path';
 
-export default (app) => {
+export default (app: any) => {
   app.use(json());
-  app.post('/v1/transcript/save', async (req, res) => {
+  app.post('/v1/transcript/save', async (req: any, res: any) => {
     try {
       if (!apiKey(req.headers)) {
         apiMessage(
@@ -35,9 +36,9 @@ export default (app) => {
         if (files.includes(transcript.ticket.id)) {
           return res.status(409).send({ success: false, cause: 'Transcript already exists' });
         }
-        var msgStr = `Ticket Id: ${transcript.ticket.id}\n${other.msgSplit}\nTicket Opened by: ${transcript.ticket.opened.by.username} (${transcript.ticket.opened.by.id})\nOpen Reason: ${transcript.ticket.opened.reason}\nTimestamp: ${transcript.ticket.opened.timestamp}\n\nTicket Closed By: ${transcript.ticket.closed.by.username} (${transcript.ticket.closed.by.id})\nClose Reason: ${transcript.ticket.closed.reason}\nTimestamp: ${transcript.ticket.closed.timestamp}\n${other.msgSplit}\n\nMessages:\n`;
-        transcript.messages.forEach((message) => {
-          msgStr += `${message.username} (${message.user}) @ ${message.timestamp}: ${message.content}\n`;
+        var msgStr = `Ticket Id: ${transcript.ticket.id}\n${msgSplit}\nTicket Opened by: ${transcript.ticket.opened.by.username} (${transcript.ticket.opened.by.id})\nOpen Reason: ${transcript.ticket.opened.reason}\nTimestamp: ${transcript.ticket.opened.timestamp}\n\nTicket Closed By: ${transcript.ticket.closed.by.username} (${transcript.ticket.closed.by.id})\nClose Reason: ${transcript.ticket.closed.reason}\nTimestamp: ${transcript.ticket.closed.timestamp}\n${msgSplit}\n\nMessages:\n`;
+        transcript.messages.forEach((message: message) => {
+          msgStr += `${message.username} (${message.id}) @ ${message.timestamp}: ${message.content}\n`;
         });
 
         writeFile(join(join(__dirname, '../../../../tickets'), `${transcript.ticket.id}.txt`), msgStr, function (err) {
@@ -60,14 +61,14 @@ export default (app) => {
               };
             }
             writeFileSync('userData.json', JSON.stringify(userData));
-          } catch (error) {
+          } catch (error: any) {
             errorMessage(`Error saving user data for ${transcript.ticket.opened.by.id}: ${error}`);
           }
           apiMessage('/v1/transcript/save', `Transcript for ticket ${transcript.ticket.id} has been saved`);
           return res.status(201).send({ success: true, info: 'Transcript saved' });
         });
       });
-    } catch (error) {
+    } catch (error: any) {
       errorMessage(error);
     }
   });

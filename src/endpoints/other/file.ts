@@ -1,10 +1,10 @@
-import { errorMessage, apiMessage } from '../../logger.js';
-import { readFileSync, stat, readFile } from 'fs';
-import { discord } from '../../config.js';
+import { apiMessage, errorMessage } from '../../logger';
+import { readFileSync, readFile, stat } from 'fs';
+import { discord } from '../../../config.json';
 import { join, extname } from 'path';
 
-export default (app) => {
-  app.get('/:file.txt', (req, res) => {
+export default (app: any) => {
+  app.get('/test', (req: any, res: any) => {
     apiMessage('/:file.txt', `File ${req.params.file} was requested by ${req.headers['x-forwarded-for']}`);
     const requestedFileName = req.params.file;
     const { userData, oauthData } = req.session;

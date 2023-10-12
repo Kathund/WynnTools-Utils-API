@@ -2,8 +2,8 @@ import { errorMessage, apiMessage } from '../../../logger.js';
 import { apiKey } from '../../../apiKey.js';
 import { readFileSync } from 'fs';
 
-export default (app) => {
-  app.get('/v1/user/get', async (req, res) => {
+export default (app: any) => {
+  app.get('/v1/user/get', async (req: any, res: any) => {
     if (!apiKey(req.headers)) {
       apiMessage(
         '/v1/user/get',
@@ -32,7 +32,7 @@ export default (app) => {
         );
         return res.status(200).send({ success: true, info: userData[userId] });
       }
-    } catch (error) {
+    } catch (error: any) {
       errorMessage(`Error fetching user ${userId}: ${error}`);
       return res.status(500).send({ success: false, cause: 'Internal Server Error' });
     }

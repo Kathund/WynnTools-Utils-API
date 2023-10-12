@@ -2,8 +2,8 @@ import { errorMessage, apiMessage } from '../../../logger.js';
 import { readFileSync, writeFileSync } from 'fs';
 import { apiKey } from '../../../apiKey.js';
 
-export default (app) => {
-  app.delete('/v1/user/remove', async (req, res) => {
+export default (app: any) => {
+  app.delete('/v1/user/remove', async (req: any, res: any) => {
     if (!apiKey(req.headers)) {
       apiMessage(
         '/v1/user/remove',
@@ -34,7 +34,7 @@ export default (app) => {
         );
         return res.status(200).send({ success: true, info: `${userId} has been removed from the database` });
       }
-    } catch (error) {
+    } catch (error: any) {
       errorMessage(`Error fetching user ${userId}: ${error}`);
       return res.status(500).send({ success: false, cause: 'Internal Server Error' });
     }

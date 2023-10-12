@@ -1,8 +1,8 @@
-import { otherMessage, errorMessage } from './logger.js';
+import { otherMessage, errorMessage } from './logger';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
-export const loadEndpoints = (directory, app) => {
+export const loadEndpoints = (directory: string, app: any) => {
   try {
     const items = readdirSync(directory);
 
@@ -14,21 +14,23 @@ export const loadEndpoints = (directory, app) => {
       const stats = statSync(itemPath);
       if (stats.isDirectory()) {
         const result = loadEndpoints(itemPath, app);
-        skipped += result.skipped;
-        loaded += result.loaded;
-      } else if (item.toLowerCase().endsWith('.js')) {
+        if (result) {
+          skipped += result.skipped;
+          loaded += result.loaded;
+        }
+      } else if (item.toLowerCase().endsWith('.ts')) {
         if (item.toLowerCase().includes('disabled')) {
           skipped++;
           continue;
         }
         loaded++;
-        const route = require(itemPath);
+        const route = require(itemPath).default;
         route(app);
-        otherMessage(`Loaded ${itemPath.split('/src/endpoints/')[1].split('.js')[0]} endpoint`);
+        otherMessage(`Loaded ${itemPath.split('\\src\\endpoints\\')[1].split('.ts')[0]} endpoint`);
       }
     }
     return { loaded, skipped };
-  } catch (error) {
+  } catch (error: any) {
     errorMessage(`Error loading endpoints: ${error}`);
   }
 };

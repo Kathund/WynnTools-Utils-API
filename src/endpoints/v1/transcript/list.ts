@@ -3,8 +3,8 @@ import { apiKey } from '../../../apiKey.js';
 import { readdir } from 'fs';
 import { join } from 'path';
 
-export default (app) => {
-  app.get('/v1/transcript/list', async (req, res) => {
+export default (app: any) => {
+  app.get('/v1/transcript/list', async (req: any, res: any) => {
     apiMessage('/v1/transcript/list', `has been triggered by ${req.headers['x-forwarded-for']}`);
     if (!apiKey(req.headers)) {
       apiMessage(

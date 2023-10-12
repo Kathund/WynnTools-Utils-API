@@ -1,21 +1,21 @@
+import { sessionSecret, discord } from '../../../../config.json';
 import { apiMessage, errorMessage } from '../../../logger.js';
-import { other, discord } from '../../../config.js';
 import session from 'express-session';
 import { json } from 'body-parser';
-import { request } from 'undici';
+import { readFileSync } from 'fs';
 
-export default (app) => {
+export default (app: any) => {
   try {
     app.use(json());
     app.use(
       session({
-        secret: other.sessionSecret,
+        secret: sessionSecret,
         resave: false,
         saveUninitialized: true,
       })
     );
 
-    app.get('/oAuth/user/user', async (req, res) => {
+    app.get('/oAuth/user/tickets', async (req: any, res: any) => {
       try {
         apiMessage('/oAuth/user', `User Info requested by ${req.headers['x-forwarded-for']}`);
         const { userData, oauthData } = req.session;
@@ -25,23 +25,20 @@ export default (app) => {
         if (userData.id !== oauthData.id) {
           return res.redirect(discord.url);
         }
-        const userResult = await request('https://discord.com/api/users/@me', {
-          headers: {
-            authorization: `${oauthData.token_type} ${oauthData.access_token}`,
-          },
-        });
-        var user = await userResult.body.json();
-        req.session.userData = user;
-        req.session.oauthData['id'] = user.id;
-        req.session.oauthData['username'] = user.username;
-        apiMessage('/oAuth/user', `User Info requested by ${req.headers['x-forwarded-for']} has been sent`);
-        return res.status(200).json(user);
-      } catch (error) {
+        const userInfo = JSON.parse(readFileSync('userData.json', 'utf8'));
+        if (!userInfo) {
+          return res.status(500).json({ message: 'Internal Server Error' });
+        }
+        if (!userInfo[userData.id]) {
+          return res.status(404).json({ message: 'You do not have any tickets' });
+        }
+        return res.status(200).json({ success: true, tickets: userInfo[userData.id].tickets });
+      } catch (error: any) {
         errorMessage(`Error while getting user: ${error}`);
         return res.status(500).json({ message: 'Internal Server Error' });
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     return errorMessage(`Error while getting user: ${error}`);
   }
 };
