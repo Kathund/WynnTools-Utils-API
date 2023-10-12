@@ -1,12 +1,12 @@
-const { errorMessage, apiMessage } = require('../../../logger.js');
-const config = require('../../../../config.json');
-const { apiKey } = require('../../../apiKey.js');
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
+import { readdir, writeFile, readFileSync, writeFileSync } from 'fs';
+import { errorMessage, apiMessage } from '../../../logger.js';
+import { apiKey } from '../../../apiKey.js';
+import { other } from '../../../config.js';
+import { json } from 'express';
+import { join } from 'path';
 
-module.exports = (app) => {
-  app.use(express.json());
+export default (app) => {
+  app.use(json());
   app.patch('/v1/transcript/edit', async (req, res) => {
     try {
       if (!apiKey(req.headers)) {
@@ -21,7 +21,7 @@ module.exports = (app) => {
         `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`
       );
       const ticketId = req.query.id;
-      fs.readdir(path.join(__dirname, '../../../../tickets'), (err, files) => {
+      readdir(join(__dirname, '../../../../tickets'), (err, files) => {
         if (err) {
           errorMessage(`/v1/transcript/remove ${err}`);
           return res.status(500).json({ success: false, cause: 'Internal Server Error' });
@@ -32,40 +32,36 @@ module.exports = (app) => {
         if (files.includes(ticketId)) {
           const transcript = req.body;
           if (!transcript) return res.status(400).send({ success: false, cause: 'No transcript provided' });
-          var msgStr = `Ticket Id: ${transcript.ticket.id}\n${config.msgSplit}\nTicket Opened by: ${transcript.ticket.opened.by.username} (${transcript.ticket.opened.by.id})\nOpen Reason: ${transcript.ticket.opened.reason}\nTimestamp: ${transcript.ticket.opened.timestamp}\n\nTicket Closed By: ${transcript.ticket.closed.by.username} (${transcript.ticket.closed.by.id})\nClose Reason: ${transcript.ticket.closed.reason}\nTimestamp: ${transcript.ticket.closed.timestamp}\n${config.msgSplit}\n\nMessages:\n`;
+          var msgStr = `Ticket Id: ${transcript.ticket.id}\n${other.msgSplit}\nTicket Opened by: ${transcript.ticket.opened.by.username} (${transcript.ticket.opened.by.id})\nOpen Reason: ${transcript.ticket.opened.reason}\nTimestamp: ${transcript.ticket.opened.timestamp}\n\nTicket Closed By: ${transcript.ticket.closed.by.username} (${transcript.ticket.closed.by.id})\nClose Reason: ${transcript.ticket.closed.reason}\nTimestamp: ${transcript.ticket.closed.timestamp}\n${other.msgSplit}\n\nMessages:\n`;
           transcript.messages.forEach((message) => {
             msgStr += `${message.username} (${message.user}) @ ${message.timestamp}: ${message.content}\n`;
           });
-          fs.writeFile(
-            path.join(path.join(__dirname, '../../../tickets'), `${transcript.ticket.id}.txt`),
-            msgStr,
-            function (err) {
-              if (err) {
-                errorMessage(`Error saving transcript ${transcript.ticket.id}: ${err}`);
-                return res.status(500).send({ success: false, cause: 'Error editing transcript' });
-              }
-              const userData = JSON.parse(fs.readFileSync('userData.json', 'utf8'));
-              try {
-                if (userData[transcript.ticket.opened.by.id]) {
-                  var userTickets = userData[transcript.ticket.opened.by.id].tickets;
-                  userTickets.push(transcript.ticket.id);
-                  userData[transcript.ticket.opened.by.id].tickets = userTickets;
-                } else {
-                  userData[transcript.ticket.opened.by.id] = {
-                    id: transcript.ticket.opened.by.id,
-                    username: transcript.ticket.opened.by.username,
-                    admin: false,
-                    tickets: [transcript.ticket.id],
-                  };
-                }
-                fs.writeFileSync('userData.json', JSON.stringify(userData));
-              } catch (error) {
-                errorMessage(`Error saving user data for ${transcript.ticket.opened.by.id}: ${error}`);
-              }
-              apiMessage('/v1/transcript/edit', `Transcript for ticket ${transcript.ticket.id} has been saved`);
-              return res.status(201).send({ success: true, info: 'Transcript edited' });
+          writeFile(join(join(__dirname, '../../../tickets'), `${transcript.ticket.id}.txt`), msgStr, function (err) {
+            if (err) {
+              errorMessage(`Error saving transcript ${transcript.ticket.id}: ${err}`);
+              return res.status(500).send({ success: false, cause: 'Error editing transcript' });
             }
-          );
+            const userData = JSON.parse(readFileSync('userData.json', 'utf8'));
+            try {
+              if (userData[transcript.ticket.opened.by.id]) {
+                var userTickets = userData[transcript.ticket.opened.by.id].tickets;
+                userTickets.push(transcript.ticket.id);
+                userData[transcript.ticket.opened.by.id].tickets = userTickets;
+              } else {
+                userData[transcript.ticket.opened.by.id] = {
+                  id: transcript.ticket.opened.by.id,
+                  username: transcript.ticket.opened.by.username,
+                  admin: false,
+                  tickets: [transcript.ticket.id],
+                };
+              }
+              writeFileSync('userData.json', JSON.stringify(userData));
+            } catch (error) {
+              errorMessage(`Error saving user data for ${transcript.ticket.opened.by.id}: ${error}`);
+            }
+            apiMessage('/v1/transcript/edit', `Transcript for ticket ${transcript.ticket.id} has been saved`);
+            return res.status(201).send({ success: true, info: 'Transcript edited' });
+          });
         } else {
           apiMessage(
             '/v1/transcript/remove',

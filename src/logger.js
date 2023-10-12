@@ -1,12 +1,12 @@
 // Credits https://github.com/DuckySoLucky/hypixel-error-chat-bridge/blob/f8a8a8e1e1c469127b8fcd03e6553b43f22b8250/src/Logger.js (Edited)
 const customLevels = { api: 0, error: 1, warn: 2, other: 3, max: 4 };
-const config = require('../config.json');
-const winston = require('winston');
-const path = require('path');
+import { createLogger, format, transports } from 'winston';
+import { other } from './config.js';
+import { join } from 'path';
 
-const logDirectory = path.join(__dirname, config.logsFolder);
+const logDirectory = join(__dirname, other.logsFolder);
 const timezone = () => {
-  if (config.timezone === null) {
+  if (other.timezone === null) {
     return new Date().toLocaleString('en-US', {
       year: 'numeric',
       month: 'numeric',
@@ -25,75 +25,75 @@ const timezone = () => {
       minute: 'numeric',
       second: 'numeric',
       hour12: false,
-      timeZone: config.timezone,
+      timeZone: other.timezone,
     });
   }
 };
-const apiLogger = winston.createLogger({
+const apiLogger = createLogger({
   level: 'api',
   levels: customLevels,
-  format: winston.format.combine(
-    winston.format.timestamp({ format: timezone }),
-    winston.format.printf(({ timestamp, level, message }) => {
+  format: format.combine(
+    format.timestamp({ format: timezone }),
+    format.printf(({ timestamp, level, message }) => {
       return `[${timestamp}] ${level.toUpperCase()} > ${message}`;
     })
   ),
   transports: [
-    new winston.transports.File({ name: 'cache', filename: path.join(logDirectory, 'api.log'), level: 'api' }),
-    new winston.transports.File({ name: 'combined', filename: path.join(logDirectory, 'combined.log'), level: 'max' }),
-    new winston.transports.Console({ levels: 'max' }),
+    new transports.File({ name: 'cache', filename: join(logDirectory, 'api.log'), level: 'api' }),
+    new transports.File({ name: 'combined', filename: join(logDirectory, 'combined.log'), level: 'max' }),
+    new transports.Console({ levels: 'max' }),
   ],
 });
 
-const errorLogger = winston.createLogger({
+const errorLogger = createLogger({
   level: 'error',
   levels: customLevels,
-  format: winston.format.combine(
-    winston.format.timestamp({ format: timezone }),
-    winston.format.printf(({ timestamp, level, message }) => {
+  format: format.combine(
+    format.timestamp({ format: timezone }),
+    format.printf(({ timestamp, level, message }) => {
       return `[${timestamp}] ${level.toUpperCase()} > ${message}`;
     })
   ),
   transports: [
-    new winston.transports.File({
+    new transports.File({
       name: 'error',
-      filename: path.join(logDirectory, 'error.log'),
+      filename: join(logDirectory, 'error.log'),
       level: 'error',
     }),
-    new winston.transports.File({ name: 'combined', filename: path.join(logDirectory, 'combined.log'), level: 'max' }),
-    new winston.transports.Console({ levels: 'max' }),
+    new transports.File({ name: 'combined', filename: join(logDirectory, 'combined.log'), level: 'max' }),
+    new transports.Console({ levels: 'max' }),
   ],
 });
 
-const warnLogger = winston.createLogger({
+const warnLogger = createLogger({
   level: 'warn',
   levels: customLevels,
-  format: winston.format.combine(
-    winston.format.timestamp({ format: timezone }),
-    winston.format.printf(({ timestamp, level, message }) => {
+  format: format.combine(
+    format.timestamp({ format: timezone }),
+    format.printf(({ timestamp, level, message }) => {
       return `[${timestamp}] ${level.toUpperCase()} > ${message}`;
     })
   ),
   transports: [
-    new winston.transports.File({ name: 'warn', filename: path.join(logDirectory, 'warn.log'), level: 'warn' }),
-    new winston.transports.File({ name: 'combined', filename: path.join(logDirectory, 'combined.log'), level: 'max' }),
-    new winston.transports.Console({ levels: 'max' }),
+    new transports.File({ name: 'warn', filename: join(logDirectory, 'warn.log'), level: 'warn' }),
+    new transports.File({ name: 'combined', filename: join(logDirectory, 'combined.log'), level: 'max' }),
+    new transports.Console({ levels: 'max' }),
   ],
 });
 
-const otherLogger = winston.createLogger({
+const otherLogger = createLogger({
   level: 'other',
   levels: customLevels,
-  format: winston.format.combine(
-    winston.format.timestamp({ format: timezone }),
-    winston.format.printf(({ timestamp, level, message }) => {
+  format: format.combine(
+    format.timestamp({ format: timezone }),
+    format.printf(({ timestamp, level, message }) => {
       return `[${timestamp}] ${level.toUpperCase()} > ${message}`;
     })
   ),
   transports: [
-    new winston.transports.File({ name: 'other', filename: path.join(logDirectory, 'other.log'), level: 'other' }),
-    new winston.transports.File({ name: 'combined', filename: path.join(logDirectory, 'combined.log'), level: 'max' }),
-    new winston.transports.Console({ levels: 'max' }),
+    new transports.File({ name: 'other', filename: join(logDirectory, 'other.log'), level: 'other' }),
+    new transports.File({ name: 'combined', filename: join(logDirectory, 'combined.log'), level: 'max' }),
+    new transports.Console({ levels: 'max' }),
   ],
 });
 
@@ -112,9 +112,7 @@ const logger = {
   },
 };
 
-module.exports = {
-  apiMessage: logger.api,
-  errorMessage: logger.error,
-  warnMessage: logger.warn,
-  otherMessage: logger.other,
-};
+export const apiMessage = logger.api;
+export const errorMessage = logger.error;
+export const warnMessage = logger.warn;
+export const otherMessage = logger.other;

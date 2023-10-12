@@ -1,15 +1,15 @@
-const { errorMessage, apiMessage } = require('../../logger.js');
-const config = require('../../../config.json');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const { request } = require('undici');
+import { errorMessage, apiMessage } from '../../logger.js';
+import { other, discord } from '../../config.js';
+import session from 'express-session';
+import { json } from 'body-parser';
+import { request } from 'undici';
 
-module.exports = (app) => {
+export default (app) => {
   try {
-    app.use(bodyParser.json());
+    app.use(json());
     app.use(
       session({
-        secret: config.sessionSecret,
+        secret: other.sessionSecret,
         resave: false,
         saveUninitialized: true,
       })
@@ -23,11 +23,11 @@ module.exports = (app) => {
           const tokenResponseData = await request('https://discord.com/api/oauth2/token', {
             method: 'POST',
             body: new URLSearchParams({
-              client_id: config.discord.clientId,
-              client_secret: config.discord.clientSecret,
+              client_id: discord.clientId,
+              client_secret: discord.clientSecret,
               code,
               grant_type: 'authorization_code',
-              redirect_uri: config.discord.redirectUrl,
+              redirect_uri: discord.redirectUrl,
               scope: 'identify',
             }).toString(),
             headers: {
@@ -53,7 +53,7 @@ module.exports = (app) => {
           return res.status(200).json({ message: `Logged in successfully as ${req.session.userData.username}` });
         } else {
           if (!oauthData) {
-            return res.redirect(config.discord.url);
+            return res.redirect(discord.url);
           }
         }
       } catch (error) {

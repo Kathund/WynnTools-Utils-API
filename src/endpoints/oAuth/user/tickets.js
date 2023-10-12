@@ -1,15 +1,15 @@
-const { apiMessage, errorMessage } = require('../../../logger.js');
-const config = require('../../../../config.json');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const fs = require('fs');
+import { apiMessage, errorMessage } from '../../../logger.js';
+import { other, discord } from '../../../config.js';
+import session from 'express-session';
+import { json } from 'body-parser';
+import { readFileSync } from 'fs';
 
-module.exports = (app) => {
+export default (app) => {
   try {
-    app.use(bodyParser.json());
+    app.use(json());
     app.use(
       session({
-        secret: config.sessionSecret,
+        secret: other.sessionSecret,
         resave: false,
         saveUninitialized: true,
       })
@@ -20,12 +20,12 @@ module.exports = (app) => {
         apiMessage('/oAuth/user', `User Info requested by ${req.headers['x-forwarded-for']}`);
         const { userData, oauthData } = req.session;
         if (!userData || !oauthData) {
-          return res.redirect(config.discord.url);
+          return res.redirect(discord.url);
         }
         if (userData.id !== oauthData.id) {
-          return res.redirect(config.discord.url);
+          return res.redirect(discord.url);
         }
-        const userInfo = JSON.parse(fs.readFileSync('userData.json', 'utf8'));
+        const userInfo = JSON.parse(readFileSync('userData.json', 'utf8'));
         if (!userInfo) {
           return res.status(500).json({ message: 'Internal Server Error' });
         }

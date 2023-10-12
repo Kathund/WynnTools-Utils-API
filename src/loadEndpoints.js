@@ -1,17 +1,17 @@
-const { otherMessage, errorMessage } = require('./logger.js');
-const path = require('path');
-const fs = require('fs');
+import { otherMessage, errorMessage } from './logger.js';
+import { readdirSync, statSync } from 'fs';
+import { join } from 'path';
 
-function loadEndpoints(directory, app) {
+export const loadEndpoints = (directory, app) => {
   try {
-    const items = fs.readdirSync(directory);
+    const items = readdirSync(directory);
 
     let skipped = 0;
     let loaded = 0;
 
     for (const item of items) {
-      const itemPath = path.join(directory, item);
-      const stats = fs.statSync(itemPath);
+      const itemPath = join(directory, item);
+      const stats = statSync(itemPath);
       if (stats.isDirectory()) {
         const result = loadEndpoints(itemPath, app);
         skipped += result.skipped;
@@ -31,6 +31,4 @@ function loadEndpoints(directory, app) {
   } catch (error) {
     errorMessage(`Error loading endpoints: ${error}`);
   }
-}
-
-module.exports = { loadEndpoints };
+};

@@ -1,9 +1,9 @@
-const { errorMessage, apiMessage } = require('../../../logger.js');
-const { apiKey } = require('../../../apiKey.js');
-const path = require('path');
-const fs = require('fs');
+import { errorMessage, apiMessage } from '../../../logger.js';
+import { apiKey } from '../../../apiKey.js';
+import { readFile } from 'fs';
+import { join } from 'path';
 
-module.exports = (app) => {
+export default (app) => {
   app.get('/v1/transcript/get', async (req, res) => {
     if (!apiKey(req.headers)) {
       apiMessage(
@@ -21,8 +21,8 @@ module.exports = (app) => {
       errorMessage(`No ticketId provided by ${req.headers['x-forwarded-for']}`);
       return res.status(400).send({ success: false, cause: 'No ticketId provided' });
     }
-    fs.readFile(
-      path.join(path.join(__dirname, '../../../../tickets'), `${ticketId}.txt`),
+    readFile(
+      join(join(__dirname, '../../../../tickets'), `${ticketId}.txt`),
       'utf8',
       function (err, data) {
         if (err) {

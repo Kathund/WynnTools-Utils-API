@@ -1,10 +1,10 @@
-const { errorMessage, apiMessage } = require('../../../logger.js');
-const { apiKey } = require('../../../apiKey.js');
-const express = require('express');
-const fs = require('fs');
+import { errorMessage, apiMessage } from '../../../logger.js';
+import { readFileSync, writeFileSync } from 'fs';
+import { apiKey } from '../../../apiKey.js';
+import { json } from 'express';
 
-module.exports = (app) => {
-  app.use(express.json());
+export default (app) => {
+  app.use(json());
   app.patch('/v1/user/edit', async (req, res) => {
     try {
       if (!apiKey(req.headers)) {
@@ -20,14 +20,14 @@ module.exports = (app) => {
       );
       const userId = req.query.id;
       if (!userId) return res.status(400).send({ success: false, cause: 'No user id provided' });
-      var userData = JSON.parse(fs.readFileSync('userData.json', 'utf8'));
+      var userData = JSON.parse(readFileSync('userData.json', 'utf8'));
       if (userData[userId]) {
         var newData = req.body;
         if (!newData) {
           return res.status(400).send({ success: false, cause: 'No user data provided' });
         }
         userData[userId] = newData;
-        fs.writeFileSync('userData.json', JSON.stringify(userData));
+        writeFileSync('userData.json', JSON.stringify(userData));
         return res.status(200).send({ success: true, info: `${userId} has been edited` });
       } else {
         return res.status(404).send({ success: false, cause: 'User not found' });

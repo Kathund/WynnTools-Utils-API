@@ -1,8 +1,8 @@
-const { errorMessage, apiMessage } = require('../../../logger.js');
-const { apiKey } = require('../../../apiKey.js');
-const fs = require('fs');
+import { errorMessage, apiMessage } from '../../../logger.js';
+import { readFileSync, writeFileSync } from 'fs';
+import { apiKey } from '../../../apiKey.js';
 
-module.exports = (app) => {
+export default (app) => {
   app.delete('/v1/user/remove', async (req, res) => {
     if (!apiKey(req.headers)) {
       apiMessage(
@@ -18,7 +18,7 @@ module.exports = (app) => {
         `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key} removing user ${userId}`
       );
       if (!userId) return res.status(400).send({ success: false, cause: 'No user id provided' });
-      const userData = JSON.parse(fs.readFileSync('userData.json', 'utf8'));
+      const userData = JSON.parse(readFileSync('userData.json', 'utf8'));
       if (!userData[userId]) {
         apiMessage(
           '/v1/user/remove',
@@ -27,7 +27,7 @@ module.exports = (app) => {
         return res.status(404).send({ success: false, cause: 'User not found' });
       } else {
         delete userData[userId];
-        fs.writeFileSync('userData.json', JSON.stringify(userData));
+        writeFileSync('userData.json', JSON.stringify(userData));
         apiMessage(
           '/v1/user/remove',
           `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key} and user ${userId} has been removed`

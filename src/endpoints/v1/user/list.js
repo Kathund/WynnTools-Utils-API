@@ -1,8 +1,8 @@
-const { errorMessage, apiMessage } = require('../../../logger.js');
-const { apiKey } = require('../../../apiKey.js');
-const fs = require('fs');
+import { errorMessage, apiMessage } from '../../../logger.js';
+import { apiKey } from '../../../apiKey.js';
+import { readFileSync } from 'fs';
 
-module.exports = (app) => {
+export default (app) => {
   app.get('/v1/user/list', async (req, res) => {
     apiMessage('/v1/user/list', `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`);
     if (!apiKey(req.headers)) {
@@ -13,7 +13,7 @@ module.exports = (app) => {
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
     try {
-      const userData = JSON.parse(fs.readFileSync('userData.json', 'utf8'));
+      const userData = JSON.parse(readFileSync('userData.json', 'utf8'));
       const keys = Object.keys(userData);
       return res.status(200).send({ success: true, info: keys });
     } catch (error) {

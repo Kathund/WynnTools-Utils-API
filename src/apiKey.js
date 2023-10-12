@@ -1,8 +1,6 @@
-const config = require('../config.json');
-module.exports = {
-  apiKey: (headers) => {
-    if (headers.key === config.api.key) {
-      return true;
-    }
-  },
+import { api } from './config.js';
+export const apiKey = (headers) => {
+  if (headers.key === api.key) {
+    return true;
+  }
 };

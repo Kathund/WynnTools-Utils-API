@@ -1,15 +1,15 @@
-const { apiMessage, errorMessage } = require('../../../logger.js');
-const config = require('../../../../config.json');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const { request } = require('undici');
+import { apiMessage, errorMessage } from '../../../logger.js';
+import { other, discord } from '../../../config.js';
+import session from 'express-session';
+import { json } from 'body-parser';
+import { request } from 'undici';
 
-module.exports = (app) => {
+export default (app) => {
   try {
-    app.use(bodyParser.json());
+    app.use(json());
     app.use(
       session({
-        secret: config.sessionSecret,
+        secret: other.sessionSecret,
         resave: false,
         saveUninitialized: true,
       })
@@ -20,10 +20,10 @@ module.exports = (app) => {
         apiMessage('/oAuth/user', `User Info requested by ${req.headers['x-forwarded-for']}`);
         const { userData, oauthData } = req.session;
         if (!userData || !oauthData) {
-          return res.redirect(config.discord.url);
+          return res.redirect(discord.url);
         }
         if (userData.id !== oauthData.id) {
-          return res.redirect(config.discord.url);
+          return res.redirect(discord.url);
         }
         const userResult = await request('https://discord.com/api/users/@me', {
           headers: {

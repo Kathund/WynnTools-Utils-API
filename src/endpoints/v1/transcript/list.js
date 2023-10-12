@@ -1,9 +1,9 @@
-const { errorMessage, apiMessage } = require('../../../logger.js');
-const { apiKey } = require('../../../apiKey.js');
-const path = require('path');
-const fs = require('fs');
+import { errorMessage, apiMessage } from '../../../logger.js';
+import { apiKey } from '../../../apiKey.js';
+import { readdir } from 'fs';
+import { join } from 'path';
 
-module.exports = (app) => {
+export default (app) => {
   app.get('/v1/transcript/list', async (req, res) => {
     apiMessage('/v1/transcript/list', `has been triggered by ${req.headers['x-forwarded-for']}`);
     if (!apiKey(req.headers)) {
@@ -13,7 +13,7 @@ module.exports = (app) => {
       );
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
-    fs.readdir(path.join(__dirname, '../../../../tickets'), (err, files) => {
+    readdir(join(__dirname, '../../../../tickets'), (err, files) => {
       if (err) {
         errorMessage(`/v1/transcript/list ${err}`);
         return res.status(500).json({ success: false, cause: 'Internal Server Error' });

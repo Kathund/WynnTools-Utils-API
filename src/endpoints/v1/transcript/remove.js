@@ -1,9 +1,9 @@
-const { errorMessage, apiMessage } = require('../../../logger.js');
-const { apiKey } = require('../../../apiKey.js');
-const path = require('path');
-const fs = require('fs');
+import { errorMessage, apiMessage } from '../../../logger.js';
+import { apiKey } from '../../../apiKey.js';
+import { readdir, unlinkSync } from 'fs';
+import { join } from 'path';
 
-module.exports = (app) => {
+export default (app) => {
   app.delete('/v1/transcript/remove', async (req, res) => {
     apiMessage(
       '/v1/transcript/remove',
@@ -26,7 +26,7 @@ module.exports = (app) => {
         `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key} removing ticket ${ticketId}`
       );
       if (!ticketId) return res.status(400).send({ success: false, cause: 'No ticket id provided' });
-      fs.readdir(path.join(__dirname, '../../../../'), (err, files) => {
+      readdir(join(__dirname, '../../../../'), (err, files) => {
         if (err) {
           errorMessage(`/v1/transcript/remove ${err}`);
           return res.status(500).json({ success: false, cause: 'Internal Server Error' });
@@ -35,7 +35,7 @@ module.exports = (app) => {
           return file.replace('.txt', '');
         });
         if (files.includes(ticketId)) {
-          fs.unlinkSync(path.join(__dirname, '../../../../tickets', `${ticketId}.txt`));
+          unlinkSync(join(__dirname, '../../../../tickets', `${ticketId}.txt`));
           return res.status(200).send({ success: true, info: `${ticketId} has been removed from the database` });
         } else {
           apiMessage(

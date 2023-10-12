@@ -21,7 +21,6 @@
     "no-throw-literal": "error",
     "no-self-compare": "error",
     "no-unreachable": "error",
-    "sort-imports": "error",
     "no-console": "error",
     "sort-vars": "error",
     "no-empty": "error",

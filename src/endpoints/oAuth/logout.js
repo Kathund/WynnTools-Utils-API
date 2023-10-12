@@ -1,14 +1,14 @@
-const { errorMessage, apiMessage } = require('../../logger.js');
-const config = require('../../../config.json');
-const session = require('express-session');
-const bodyParser = require('body-parser');
+import { errorMessage, apiMessage } from '../../logger.js';
+import { other } from '../../config.js';
+import session from 'express-session';
+import { json } from 'body-parser';
 
-module.exports = (app) => {
+export default (app) => {
   try {
-    app.use(bodyParser.json());
+    app.use(json());
     app.use(
       session({
-        secret: config.sessionSecret,
+        secret: other.sessionSecret,
         resave: false,
         saveUninitialized: true,
       })
