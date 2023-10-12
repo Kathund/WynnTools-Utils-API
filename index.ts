@@ -1,6 +1,6 @@
 import { loadEndpoints } from './src/loadEndpoints';
 import { otherMessage } from './src/logger';
-import { api } from './config.json';
+import { discord, api } from './config.json';
 import express from 'express';
 import { join } from 'path';
 
@@ -8,7 +8,7 @@ const app = express();
 
 try {
   app.get('/', async (req: any, res: any) => {
-    return res.redirect('https://stackoverflow.com/questions/36316118/typescript-dirname-value');
+    return res.redirect(discord.url);
   });
 
   const endpointsDir = join(__dirname, 'src', 'endpoints');
