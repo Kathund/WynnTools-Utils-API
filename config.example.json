@@ -12,5 +12,8 @@
   "api": {
     "key": "API_KEY",
     "PORT": 1337
+  },
+  "mongo": {
+    "url": "MONGO_DB_URL"
   }
 }

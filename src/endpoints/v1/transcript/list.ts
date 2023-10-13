@@ -1,8 +1,8 @@
+import type { mongoResponse } from '../../../../types.d.ts';
 import { errorMessage, apiMessage } from '../../../logger';
 import { Application, Request, Response } from 'express';
+import { getTickets } from '../../../mongo';
 import { apiKey } from '../../../apiKey';
-import { readdir } from 'fs';
-import { join } from 'path';
 
 export default (app: Application) => {
   app.get('/v1/transcript/list', async (req: Request, res: Response) => {
@@ -14,19 +14,11 @@ export default (app: Application) => {
       );
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
-    readdir(join(__dirname, '../../../../tickets'), (err, files) => {
-      if (err) {
-        errorMessage(`/v1/transcript/list ${err}`);
-        return res.status(500).json({ success: false, cause: 'Internal Server Error' });
-      }
-      files = files.map((file) => {
-        return file.replace('.txt', '');
-      });
-      apiMessage(
-        '/v1/transcript/list',
-        `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`
-      );
-      return res.status(200).json({ success: true, transcripts: files });
-    });
+    const tickets = (await getTickets()) as unknown as mongoResponse;
+    if (!tickets.success) {
+      errorMessage(`Failed to fetch tickets`);
+      return res.status(400).send({ success: false, cause: 'Failed to fetch tickets' });
+    }
+    return res.status(200).send({ success: true, info: 'Tickets fetched', tickets: tickets.info });
   });
 };

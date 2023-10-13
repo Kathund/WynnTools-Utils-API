@@ -1,4 +1,4 @@
-const customLevels = { api: 0, error: 1, warn: 2, other: 3, max: 4 };
+const customLevels = { api: 0, error: 1, warn: 2, other: 3, mongo: 4, max: 5 };
 import { createLogger, format, transports } from 'winston';
 
 const timezone = () => {
@@ -36,6 +36,11 @@ const otherTransport = new transports.File({
 const combinedTransport = new transports.File({
   level: 'max',
   filename: './logs/combined.log',
+});
+
+const mongoTransport = new transports.File({
+  level: 'mongo',
+  filename: './logs/mongo.log',
 });
 
 const consoleTransport = new transports.Console({
@@ -90,6 +95,18 @@ const otherLogger = createLogger({
   transports: [otherTransport, combinedTransport, consoleTransport],
 });
 
+const mongoLogger = createLogger({
+  level: 'mongo',
+  levels: customLevels,
+  format: format.combine(
+    format.timestamp({ format: timezone }),
+    format.printf(({ timestamp, level, message }) => {
+      return `[${timestamp}] ${level.toUpperCase()} > ${message}`;
+    })
+  ),
+  transports: [mongoTransport, combinedTransport, consoleTransport],
+});
+
 const logger = {
   api: (endPoint: string, message: string) => {
     apiLogger.log('api', `${endPoint} | ${message}`);
@@ -103,9 +120,13 @@ const logger = {
   other: (message: string) => {
     otherLogger.log('other', message);
   },
+  mongo: (message: string) => {
+    mongoLogger.log('mongo', message);
+  },
 };
 
 export const apiMessage = logger.api;
 export const errorMessage = logger.error;
 export const warnMessage = logger.warn;
 export const otherMessage = logger.other;
+export const mongoMessage = logger.mongo;

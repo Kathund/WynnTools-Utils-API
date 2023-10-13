@@ -1,38 +1,4 @@
-type oauthData = {
-  token_type: string;
-  access_token: string;
-  expires_in: number;
-  refresh_token: string;
-  scope: string;
-  id?: string;
-  username?: string;
-};
-type userData = {
-  id: string;
-  username: string;
-  avatar: string;
-  discriminator: string;
-  public_flags: number;
-  flags: number;
-  banner: null | string;
-  accent_color: number;
-  global_name: string;
-  avatar_decoration_data: null | {
-    asset: string;
-    sku_id: string;
-  };
-  banner_color: string;
-  mfa_enabled: boolean;
-  locale: string;
-  premium_type: number;
-};
-declare module 'express-session' {
-  interface SessionData {
-    oauthData?: oauthData;
-    userData?: userData;
-    ticketId?: string;
-  }
-}
+import type { oauthData, discordApiUser } from '../../../types.d.ts';
 import { sessionSecret, discord } from '../../../config.json';
 import { Application, Request, Response } from 'express';
 import { errorMessage, apiMessage } from '../../logger';
@@ -79,7 +45,7 @@ export default (app: Application) => {
             },
           });
 
-          const userData = (await userResult.body.json()) as userData;
+          const userData = (await userResult.body.json()) as discordApiUser;
           req.session.userData = userData;
           req.session.oauthData['id'] = req.session.userData.id;
           req.session.oauthData['username'] = req.session.userData.username;

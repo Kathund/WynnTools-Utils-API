@@ -1,23 +1,5 @@
-type user = {
-  id: string;
-  username: string;
-  avatar: string;
-  discriminator: string;
-  public_flags: number;
-  flags: number;
-  banner: null | string;
-  accent_color: number;
-  global_name: string;
-  avatar_decoration_data: null | {
-    asset: string;
-    sku_id: string;
-  };
-  banner_color: string;
-  mfa_enabled: boolean;
-  locale: string;
-  premium_type: number;
-};
 import { sessionSecret, discord } from '../../../../config.json';
+import type { discordApiUser } from '../../../../types.d.ts';
 import { apiMessage, errorMessage } from '../../../logger';
 import { Application, Request, Response } from 'express';
 import session from 'express-session';
@@ -50,7 +32,7 @@ export default (app: Application) => {
             authorization: `${oauthData.token_type} ${oauthData.access_token}`,
           },
         });
-        const user = (await userResult.body.json()) as user;
+        const user = (await userResult.body.json()) as discordApiUser;
         req.session.userData = user;
         oauthData['id'] = user.id;
         oauthData['username'] = user.username;

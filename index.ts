@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { loadEndpoints } from './src/loadEndpoints';
 import { discord, api } from './config.json';
 import { otherMessage } from './src/logger';
+import { connectDB } from './src/mongo';
 import { join } from 'path';
 
 const app = express();
@@ -18,6 +19,8 @@ try {
   } else {
     otherMessage(`No endpoints found in ${endpointsDir}`);
   }
+
+  connectDB();
 
   app.listen(api.PORT, () => {
     otherMessage(`Server started on port ${api.PORT} @ http://localhost:${api.PORT}`);

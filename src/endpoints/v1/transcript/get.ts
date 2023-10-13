@@ -1,8 +1,8 @@
+import type { mongoResponse } from '../../../../types.d.ts';
 import { errorMessage, apiMessage } from '../../../logger';
 import { Application, Request, Response } from 'express';
+import { getTicket } from '../../../mongo';
 import { apiKey } from '../../../apiKey';
-import { readFile } from 'fs';
-import { join } from 'path';
 
 export default (app: Application) => {
   app.get('/v1/transcript/get', async (req: Request, res: Response) => {
@@ -13,7 +13,7 @@ export default (app: Application) => {
       );
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
-    const ticketId = req.query.id;
+    const ticketId = req.query.id as string;
     apiMessage(
       '/v1/transcript/get',
       `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key} fetching ticket ${ticketId}`
@@ -22,16 +22,11 @@ export default (app: Application) => {
       errorMessage(`No ticketId provided by ${req.headers['x-forwarded-for']}`);
       return res.status(400).send({ success: false, cause: 'No ticketId provided' });
     }
-    readFile(join(join(__dirname, '../../../../tickets'), `${ticketId}.txt`), 'utf8', function (err, data) {
-      if (err) {
-        errorMessage(`Error viewing transcript ${ticketId}: ${err}`);
-        return res.status(404).send({ success: false, cause: 'No transcript found' });
-      }
-      apiMessage(
-        '/v1/transcript/get',
-        `Transcript for ticket ${ticketId} has been sent to ${req.headers['x-forwarded-for']}`
-      );
-      return res.status(200).send({ success: true, info: data });
-    });
+    const ticket = (await getTicket(ticketId)) as unknown as mongoResponse;
+    if (!ticket.success) {
+      errorMessage(`Ticket ${ticketId} does not exist`);
+      return res.status(400).send({ success: false, cause: 'Ticket does not exist' });
+    }
+    return res.status(200).send({ success: true, cause: 'Ticket fetched', ticket: ticket.info });
   });
 };

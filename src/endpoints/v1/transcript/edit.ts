@@ -1,10 +1,8 @@
-type message = { username: string; id: string; timestamp: number; content: string; avatar: string };
-import { readdir, writeFile, readFileSync, writeFileSync } from 'fs';
+import type { transcript, mongoResponse } from '../../../../types.d.ts';
 import { json, Application, Request, Response } from 'express';
 import { errorMessage, apiMessage } from '../../../logger';
-import { msgSplit } from '../../../../config.json';
+import { getTicket, editTicket } from '../../../mongo';
 import { apiKey } from '../../../apiKey';
-import { join } from 'path';
 
 export default (app: Application) => {
   app.use(json());
@@ -22,55 +20,26 @@ export default (app: Application) => {
         `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`
       );
       const ticketId = req.query.id as string;
-      readdir(join(__dirname, '../../../../tickets'), (err, files) => {
-        if (err) {
-          errorMessage(`/v1/transcript/remove ${err}`);
-          return res.status(500).json({ success: false, cause: 'Internal Server Error' });
-        }
-        files = files.map((file) => {
-          return file.replace('.txt', '');
-        });
-        if (files.includes(ticketId)) {
-          const transcript = req.body;
-          if (!transcript) return res.status(400).send({ success: false, cause: 'No transcript provided' });
-          let msgStr = `Ticket Id: ${transcript.ticket.id}\n${msgSplit}\nTicket Opened by: ${transcript.ticket.opened.by.username} (${transcript.ticket.opened.by.id})\nOpen Reason: ${transcript.ticket.opened.reason}\nTimestamp: ${transcript.ticket.opened.timestamp}\n\nTicket Closed By: ${transcript.ticket.closed.by.username} (${transcript.ticket.closed.by.id})\nClose Reason: ${transcript.ticket.closed.reason}\nTimestamp: ${transcript.ticket.closed.timestamp}\n${msgSplit}\n\nMessages:\n`;
-          transcript.messages.forEach((message: message) => {
-            msgStr += `${message.username} (${message.id}) @ ${message.timestamp}: ${message.content}\n`;
-          });
-          writeFile(join(join(__dirname, '../../../tickets'), `${transcript.ticket.id}.txt`), msgStr, function (err) {
-            if (err) {
-              errorMessage(`Error saving transcript ${transcript.ticket.id}: ${err}`);
-              return res.status(500).send({ success: false, cause: 'Error editing transcript' });
-            }
-            const userData = JSON.parse(readFileSync('userData.json', 'utf8'));
-            try {
-              if (userData[transcript.ticket.opened.by.id]) {
-                const userTickets = userData[transcript.ticket.opened.by.id].tickets;
-                userTickets.push(transcript.ticket.id);
-                userData[transcript.ticket.opened.by.id].tickets = userTickets;
-              } else {
-                userData[transcript.ticket.opened.by.id] = {
-                  id: transcript.ticket.opened.by.id,
-                  username: transcript.ticket.opened.by.username,
-                  admin: false,
-                  tickets: [transcript.ticket.id],
-                };
-              }
-              writeFileSync('userData.json', JSON.stringify(userData));
-            } catch (error: any) {
-              errorMessage(`Error saving user data for ${transcript.ticket.opened.by.id}: ${error}`);
-            }
-            apiMessage('/v1/transcript/edit', `Transcript for ticket ${transcript.ticket.id} has been saved`);
-            return res.status(201).send({ success: true, info: 'Transcript edited' });
-          });
-        } else {
-          apiMessage(
-            '/v1/transcript/remove',
-            `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key} but the ticket ${ticketId} was not found`
-          );
-          return res.status(404).send({ success: false, cause: 'Ticket not found' });
-        }
-      });
+      if (!ticketId) {
+        return res.status(400).send({ success: false, cause: 'No ticket id provided' });
+      }
+      const transcript: transcript = req.body;
+      if (!transcript) {
+        return res.status(400).send({ success: false, cause: 'No transcript provided' });
+      }
+      const ticket = (await getTicket(ticketId)) as unknown as mongoResponse;
+      if (!ticket.success) {
+        return res.status(400).send({ success: false, cause: 'Ticket does not exist' });
+      }
+      const editedTicket = (await editTicket(
+        ticketId,
+        transcript.ticket,
+        transcript.messages
+      )) as unknown as mongoResponse;
+      if (!editedTicket.success) {
+        return res.status(400).send({ success: false, cause: 'Failed to edit ticket' });
+      }
+      return res.status(200).send({ success: true, cause: 'Ticket edited' });
     } catch (error: any) {
       errorMessage(error);
       return res.status(500).send({ success: false, cause: 'Internal server error' });
