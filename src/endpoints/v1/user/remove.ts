@@ -1,9 +1,10 @@
 import { errorMessage, apiMessage } from '../../../logger';
+import { Application, Request, Response } from 'express';
 import { readFileSync, writeFileSync } from 'fs';
 import { apiKey } from '../../../apiKey';
 
-export default (app: any) => {
-  app.delete('/v1/user/remove', async (req: any, res: any) => {
+export default (app: Application) => {
+  app.delete('/v1/user/remove', async (req: Request, res: Response) => {
     if (!apiKey(req.headers)) {
       apiMessage(
         '/v1/user/remove',
@@ -11,7 +12,7 @@ export default (app: any) => {
       );
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
-    const userId = req.query.id;
+    const userId = req.query.id as string;
     try {
       apiMessage(
         '/v1/user/remove',

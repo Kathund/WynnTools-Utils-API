@@ -1,10 +1,11 @@
 import { errorMessage, apiMessage } from '../../../logger';
+import { Application, Request, Response } from 'express';
 import { apiKey } from '../../../apiKey';
 import { readFile } from 'fs';
 import { join } from 'path';
 
-export default (app: any) => {
-  app.get('/v1/transcript/get', async (req: any, res: any) => {
+export default (app: Application) => {
+  app.get('/v1/transcript/get', async (req: Request, res: Response) => {
     if (!apiKey(req.headers)) {
       apiMessage(
         '/v1/transcript/get',

@@ -1,10 +1,11 @@
 import { sessionSecret, discord } from '../../../../config.json';
 import { apiMessage, errorMessage } from '../../../logger';
+import { Application, Request, Response } from 'express';
 import session from 'express-session';
 import { json } from 'body-parser';
 import { readFileSync } from 'fs';
 
-export default (app: any) => {
+export default (app: Application) => {
   try {
     app.use(json());
     app.use(
@@ -15,7 +16,7 @@ export default (app: any) => {
       })
     );
 
-    app.get('/oAuth/user/tickets', async (req: any, res: any) => {
+    app.get('/oAuth/user/tickets', async (req: Request, res: Response) => {
       try {
         apiMessage('/oAuth/user', `User Info requested by ${req.headers['x-forwarded-for']}`);
         const { userData, oauthData } = req.session;

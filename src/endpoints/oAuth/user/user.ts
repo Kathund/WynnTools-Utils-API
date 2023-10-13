@@ -1,11 +1,30 @@
-type user = { username: string; token_type: string; access_token: string; id?: string };
-import { apiMessage, errorMessage } from '../../../logger';
+type user = {
+  id: string;
+  username: string;
+  avatar: string;
+  discriminator: string;
+  public_flags: number;
+  flags: number;
+  banner: null | string;
+  accent_color: number;
+  global_name: string;
+  avatar_decoration_data: null | {
+    asset: string;
+    sku_id: string;
+  };
+  banner_color: string;
+  mfa_enabled: boolean;
+  locale: string;
+  premium_type: number;
+};
 import { sessionSecret, discord } from '../../../../config.json';
+import { apiMessage, errorMessage } from '../../../logger';
+import { Application, Request, Response } from 'express';
 import session from 'express-session';
 import { json } from 'body-parser';
 import { request } from 'undici';
 
-export default (app: any) => {
+export default (app: Application) => {
   try {
     app.use(json());
     app.use(
@@ -16,7 +35,7 @@ export default (app: any) => {
       })
     );
 
-    app.get('/oAuth/user/user', async (req: any, res: any) => {
+    app.get('/oAuth/user/user', async (req: Request, res: Response) => {
       try {
         apiMessage('/oAuth/user', `User Info requested by ${req.headers['x-forwarded-for']}`);
         const { userData, oauthData } = req.session;
@@ -33,8 +52,8 @@ export default (app: any) => {
         });
         const user = (await userResult.body.json()) as user;
         req.session.userData = user;
-        req.session.oauthData['id'] = user.id;
-        req.session.oauthData['username'] = user.username;
+        oauthData['id'] = user.id;
+        oauthData['username'] = user.username;
         apiMessage('/oAuth/user', `User Info requested by ${req.headers['x-forwarded-for']} has been sent`);
         return res.status(200).json(user);
       } catch (error: any) {

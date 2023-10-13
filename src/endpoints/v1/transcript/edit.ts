@@ -1,14 +1,14 @@
 type message = { username: string; id: string; timestamp: number; content: string; avatar: string };
 import { readdir, writeFile, readFileSync, writeFileSync } from 'fs';
+import { json, Application, Request, Response } from 'express';
 import { errorMessage, apiMessage } from '../../../logger';
 import { msgSplit } from '../../../../config.json';
 import { apiKey } from '../../../apiKey';
-import { json } from 'express';
 import { join } from 'path';
 
-export default (app: any) => {
+export default (app: Application) => {
   app.use(json());
-  app.patch('/v1/transcript/edit', async (req: any, res: any) => {
+  app.patch('/v1/transcript/edit', async (req: Request, res: Response) => {
     try {
       if (!apiKey(req.headers)) {
         apiMessage(
@@ -21,7 +21,7 @@ export default (app: any) => {
         '/v1/transcript/edit',
         `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`
       );
-      const ticketId = req.query.id;
+      const ticketId = req.query.id as string;
       readdir(join(__dirname, '../../../../tickets'), (err, files) => {
         if (err) {
           errorMessage(`/v1/transcript/remove ${err}`);

@@ -1,9 +1,10 @@
 import { errorMessage, apiMessage } from '../../../logger';
+import { Application, Request, Response } from 'express';
 import { apiKey } from '../../../apiKey';
 import { readFileSync } from 'fs';
 
-export default (app: any) => {
-  app.get('/v1/user/list', async (req: any, res: any) => {
+export default (app: Application) => {
+  app.get('/v1/user/list', async (req: Request, res: Response) => {
     apiMessage('/v1/user/list', `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`);
     if (!apiKey(req.headers)) {
       apiMessage(

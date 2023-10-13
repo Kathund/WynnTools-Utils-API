@@ -1,14 +1,14 @@
 type message = { username: string; id: string; timestamp: number; content: string; avatar: string };
 import { readdir, writeFile, readFileSync, writeFileSync } from 'fs';
+import { json, Application, Request, Response } from 'express';
 import { errorMessage, apiMessage } from '../../../logger';
 import { msgSplit } from '../../../../config.json';
 import { apiKey } from '../../../apiKey';
-import { json } from 'express';
 import { join } from 'path';
 
-export default (app: any) => {
-  app.use(json());
-  app.post('/v1/transcript/save', async (req: any, res: any) => {
+export default (app: Application) => {
+  app.post('/v1/transcript/save', async (req: Request, res: Response) => {
+    app.use(json());
     try {
       if (!apiKey(req.headers)) {
         apiMessage(

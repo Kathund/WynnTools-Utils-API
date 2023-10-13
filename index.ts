@@ -1,13 +1,13 @@
+import express, { Request, Response } from 'express';
 import { loadEndpoints } from './src/loadEndpoints';
-import { otherMessage } from './src/logger';
 import { discord, api } from './config.json';
-import express from 'express';
+import { otherMessage } from './src/logger';
 import { join } from 'path';
 
 const app = express();
 
 try {
-  app.get('/', async (req: any, res: any) => {
+  app.get('/', async (req: Request, res: Response) => {
     return res.redirect(discord.url);
   });
 

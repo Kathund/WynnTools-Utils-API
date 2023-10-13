@@ -1,10 +1,11 @@
 import { errorMessage, apiMessage } from '../../../logger';
+import { Application, Request, Response } from 'express';
 import { apiKey } from '../../../apiKey';
 import { readdir } from 'fs';
 import { join } from 'path';
 
-export default (app: any) => {
-  app.get('/v1/transcript/list', async (req: any, res: any) => {
+export default (app: Application) => {
+  app.get('/v1/transcript/list', async (req: Request, res: Response) => {
     apiMessage('/v1/transcript/list', `has been triggered by ${req.headers['x-forwarded-for']}`);
     if (!apiKey(req.headers)) {
       apiMessage(

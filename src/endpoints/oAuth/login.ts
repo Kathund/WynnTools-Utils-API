@@ -1,4 +1,12 @@
-type oauthData = { token_type: string; access_token: string; expires_in: number; refresh_token: string; scope: string };
+type oauthData = {
+  token_type: string;
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  scope: string;
+  id?: string;
+  username?: string;
+};
 type userData = {
   id: string;
   username: string;
@@ -18,14 +26,21 @@ type userData = {
   locale: string;
   premium_type: number;
 };
+declare module 'express-session' {
+  interface SessionData {
+    oauthData?: oauthData;
+    userData?: userData;
+    ticketId?: string;
+  }
+}
 import { sessionSecret, discord } from '../../../config.json';
+import { Application, Request, Response } from 'express';
 import { errorMessage, apiMessage } from '../../logger';
-import { Request, Response } from 'express';
 import session from 'express-session';
 import { json } from 'body-parser';
 import { request } from 'undici';
 
-export default (app: any) => {
+export default (app: Application) => {
   try {
     app.use(json());
     app.use(
@@ -46,7 +61,7 @@ export default (app: any) => {
             body: new URLSearchParams({
               client_id: discord.clientId,
               client_secret: discord.clientSecret,
-              code,
+              code: code.toString(),
               grant_type: 'authorization_code',
               redirect_uri: discord.redirectUrl,
               scope: 'identify',

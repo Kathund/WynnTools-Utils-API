@@ -1,11 +1,11 @@
 import { errorMessage, apiMessage } from '../../../logger';
+import { Application, Request, Response, json } from 'express';
 import { readFileSync, writeFileSync } from 'fs';
 import { apiKey } from '../../../apiKey';
-import { json } from 'express';
 
-export default (app: any) => {
+export default (app: Application) => {
   app.use(json());
-  app.patch('/v1/user/edit', async (req: any, res: any) => {
+  app.patch('/v1/user/edit', async (req: Request, res: Response) => {
     try {
       if (!apiKey(req.headers)) {
         apiMessage(
@@ -18,7 +18,7 @@ export default (app: any) => {
         '/v1/user/edit',
         `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`
       );
-      const userId = req.query.id;
+      const userId = req.query.id as string;
       if (!userId) return res.status(400).send({ success: false, cause: 'No user id provided' });
       const userData = JSON.parse(readFileSync('userData.json', 'utf8'));
       if (userData[userId]) {
