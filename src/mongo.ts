@@ -1,4 +1,4 @@
-import type { ticket, message, user } from '../types.d.ts';
+import type { user, fullTicket } from '../types.d.ts';
 import { errorMessage, mongoMessage } from './logger';
 import { Schema, connect, model } from 'mongoose';
 import { mongo } from '../config.json';
@@ -9,17 +9,28 @@ export const connectDB = () => {
 };
 
 const ticketSchema = new Schema({
-  id: String,
-  opened: { timestamp: Number, reason: String, by: { id: String, username: String } },
-  closed: { by: { id: String, username: String }, reason: String, timestamp: Number },
-});
-
-const messageSchema = new Schema({
-  username: String,
-  id: String,
-  timestamp: Number,
-  content: String,
-  avatar: String,
+  ticket: {
+    id: String,
+    opened: {
+      timestamp: String,
+      reason: String,
+      by: { id: String, username: String, avatar: String },
+    },
+    closed: {
+      timestamp: String,
+      reason: String,
+      by: { id: String, username: String, avatar: String },
+    },
+  },
+  messages: [
+    {
+      username: String,
+      id: String,
+      timestamp: Number,
+      content: String,
+      avatar: String,
+    },
+  ],
 });
 
 const userSchema = new Schema({
@@ -29,24 +40,32 @@ const userSchema = new Schema({
   tickets: [String],
 });
 
-const ticketsSchema = new Schema({
-  ticketSchema,
-  messageSchema,
-});
-
-export const Ticket = model('Ticket', ticketsSchema);
+export const Ticket = model('Ticket', ticketSchema);
 
 export const User = model('User', userSchema);
 
-export const saveTicket = async (ticket: ticket, messages: message[]) => {
-  const newTicket = new Ticket({ ticket, messages });
-  await newTicket.save();
-  return { success: true, info: 'Saved ticket' };
+export const saveTicket = async (ticket: fullTicket) => {
+  try {
+    const newTicket = new Ticket(ticket);
+    await newTicket.save();
+    return { success: true, info: 'Saved ticket' };
+  } catch (error: any) {
+    errorMessage(error);
+    return { success: false, info: 'Error saving ticket' };
+  }
 };
 
 export const getTicket = async (id: string) => {
-  const ticket = await Ticket.findOne({ 'ticket.id': id });
-  return ticket;
+  try {
+    const ticket = await Ticket.findOne({ 'ticket.id': id });
+    if (!ticket) {
+      return { success: false, info: 'Ticket does not exist' };
+    }
+    return { success: true, info: ticket };
+  } catch (error: any) {
+    errorMessage(error);
+    return { success: false, info: 'Error getting ticket' };
+  }
 };
 
 export const getTickets = async () => {
@@ -54,30 +73,24 @@ export const getTickets = async () => {
   return { success: true, info: tickets };
 };
 
-export const editTicket = async (id: string, updatedTicket: ticket, updatedMessages: message[]) => {
-  await Ticket.findOneAndUpdate(
-    { 'ticket.id': id },
-    { ticket: updatedTicket, messages: updatedMessages },
-    function (err: Error) {
-      if (err) {
-        errorMessage(err.toString());
-        return { success: false, info: 'Error editing ticket' };
-      } else {
-        return { success: true, info: 'Edited Ticket' };
-      }
-    }
-  );
+export const editTicket = async (id: string, updatedTicket: fullTicket) => {
+  try {
+    await Ticket.findOneAndUpdate({ 'ticket.id': id }, { ticket: updatedTicket });
+    return { success: true, info: 'Edited ticket' };
+  } catch (error: any) {
+    errorMessage(error);
+    return { success: false, info: 'Error editing ticket' };
+  }
 };
 
 export const deleteTicket = async (id: string) => {
-  await Ticket.findOneAndDelete({ 'ticket.id': id }, function (err: Error) {
-    if (err) {
-      errorMessage(err.toString());
-      return { success: false, info: 'Error deleting ticket' };
-    } else {
-      return { success: true, info: 'Deleted ticket' };
-    }
-  });
+  try {
+    await Ticket.findOneAndDelete({ 'ticket.id': id });
+    return { success: true, info: 'Deleted ticket' };
+  } catch (error: any) {
+    errorMessage(error);
+    return { success: false, info: 'Error deleting ticket' };
+  }
 };
 
 export const saveUser = async (user: user) => {
@@ -87,14 +100,13 @@ export const saveUser = async (user: user) => {
 };
 
 export const getUser = async (id: string) => {
-  await User.findOne({ id: id }, function (err: Error, user: user) {
-    if (err) {
-      errorMessage(err.toString());
-      return { success: false, info: 'Error getting user' };
-    } else {
-      return { success: true, info: user };
-    }
-  });
+  try {
+    const user = await User.findOne({ id: id });
+    return { success: true, info: user };
+  } catch (error: any) {
+    errorMessage(error);
+    return { success: false, info: 'Error getting user' };
+  }
 };
 
 export const getUsers = async () => {
@@ -103,23 +115,21 @@ export const getUsers = async () => {
 };
 
 export const editUser = async (id: string, updatedUser: user) => {
-  await User.findOneAndUpdate({ id: id }, updatedUser, function (err: Error) {
-    if (err) {
-      errorMessage(err.toString());
-      return { success: false, info: 'Error editing user' };
-    } else {
-      return { success: true, info: 'Edited user' };
-    }
-  });
+  try {
+    await User.findOneAndUpdate({ id: id }, updatedUser);
+    return { success: true, info: 'Edited user' };
+  } catch (error: any) {
+    errorMessage(error);
+    return { success: false, info: 'Error editing user' };
+  }
 };
 
 export const deleteUser = async (id: string) => {
-  await User.findOneAndDelete({ id: id }, function (err: Error) {
-    if (err) {
-      errorMessage(err.toString());
-      return { success: false, info: 'Error deleting user' };
-    } else {
-      return { success: true, info: 'Deleted user' };
-    }
-  });
+  try {
+    await User.findOneAndDelete({ id: id });
+    return { success: true, info: 'Deleted user' };
+  } catch (error: any) {
+    errorMessage(error);
+    return { success: false, info: 'Error deleting user' };
+  }
 };

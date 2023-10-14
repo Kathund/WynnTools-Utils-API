@@ -6,7 +6,6 @@ import { apiKey } from '../../../apiKey';
 
 export default (app: Application) => {
   app.get('/v1/transcript/list', async (req: Request, res: Response) => {
-    apiMessage('/v1/transcript/list', `has been triggered by ${req.headers['x-forwarded-for']}`);
     if (!apiKey(req.headers)) {
       apiMessage(
         '/v1/transcript/list',
@@ -14,6 +13,10 @@ export default (app: Application) => {
       );
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
+    apiMessage(
+      '/v1/transcript/list',
+      `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`
+    );
     const tickets = (await getTickets()) as unknown as mongoResponse;
     if (!tickets.success) {
       errorMessage(`Failed to fetch tickets`);

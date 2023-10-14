@@ -30,7 +30,7 @@ const warnTransport = new transports.File({
 
 const otherTransport = new transports.File({
   level: 'other',
-  filename: './logs/log',
+  filename: './logs/other.log',
 });
 
 const combinedTransport = new transports.File({

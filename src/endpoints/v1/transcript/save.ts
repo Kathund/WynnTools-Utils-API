@@ -1,4 +1,4 @@
-import type { transcript, userResult, mongoResponse } from '../../../../types.d.ts';
+import type { fullTicket, userResult, mongoResponse } from '../../../../types.d.ts';
 import { getUser, saveUser, editUser, getTicket, saveTicket } from '../../../mongo';
 import { json, Application, Request, Response } from 'express';
 import { errorMessage, apiMessage } from '../../../logger';
@@ -19,7 +19,7 @@ export default (app: Application) => {
         '/v1/transcript/save',
         `has been triggered by ${req.headers['x-forwarded-for']} using key ${req.headers.key}`
       );
-      const transcript: transcript = req.body;
+      const transcript: fullTicket = req.body;
       if (!transcript) {
         return res.status(400).send({ success: false, cause: 'No transcript provided' });
       }
@@ -35,22 +35,34 @@ export default (app: Application) => {
           return res.status(400).send({ success: false, cause: 'Failed to save user' });
         }
       } else {
-        const editedUser = (await editUser(transcript.ticket.opened.by.id, {
-          id: transcript.ticket.opened.by.id,
-          username: transcript.ticket.opened.by.username,
-          admin: false,
-          tickets: [...user.info.tickets, transcript.ticket.id],
-        })) as unknown as mongoResponse;
-        if (!editedUser.success) {
-          return res.status(400).send({ success: false, cause: 'Failed to edit user' });
+        if (user.info === null) {
+          const newUser = await saveUser({
+            id: transcript.ticket.opened.by.id,
+            username: transcript.ticket.opened.by.username,
+            admin: false,
+            tickets: [transcript.ticket.id],
+          });
+          if (!newUser.success) {
+            return res.status(400).send({ success: false, cause: 'Failed to save user' });
+          }
+        } else {
+          const editedUser = (await editUser(transcript.ticket.opened.by.id, {
+            id: transcript.ticket.opened.by.id,
+            username: transcript.ticket.opened.by.username,
+            admin: false,
+            tickets: [...user.info.tickets, transcript.ticket.id],
+          })) as unknown as mongoResponse;
+          if (!editedUser.success) {
+            return res.status(400).send({ success: false, cause: 'Failed to edit user' });
+          }
         }
       }
 
       const ticket = await getTicket(transcript.ticket.id);
-      if (ticket) {
+      if (ticket.success) {
         return res.status(400).send({ success: false, cause: 'Ticket already exists' });
       }
-      const newTicket = await saveTicket(transcript.ticket, transcript.messages);
+      const newTicket = await saveTicket(transcript);
       if (!newTicket.success) {
         return res.status(400).send({ success: false, cause: 'Failed to save ticket' });
       } else {

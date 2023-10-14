@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
+  "types": "types.d.ts",
   "scripts": {
-    "fix": "rm -rf node_modules/ && npm install @types/express @types/express-session typescript ts-node --save-dev && npm install express express-session && npx ts-node index.ts",
     "start": "npx ts-node index.ts",
     "lint:check": "npx eslint src/ index.ts",
     "lint": "npx eslint src/ index.ts --fix",

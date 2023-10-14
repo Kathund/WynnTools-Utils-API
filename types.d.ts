@@ -1,7 +1,7 @@
 export type ticket = {
   id: string;
-  opened: { timestamp: number; reason: string; by: { id: string; username: string } };
-  closed: { by: { id: string; username: string }; reason: string; timestamp: number };
+  opened: { timestamp: string; reason: string; by: { id: string; username: string; avatar: string } };
+  closed: { timestamp: string; reason: string; by: { id: string; username: string; avatar: string } };
 };
 
 export type message = {
@@ -12,9 +12,9 @@ export type message = {
   avatar: string;
 };
 
-export type ticketAndMessage = {
+export type fullTicket = {
   ticket: ticket;
-  message: message[];
+  messages: message[];
 };
 
 export type user = {
@@ -64,12 +64,7 @@ export interface userResult {
   info: user;
 }
 
-export interface transcript {
-  ticket: ticket;
-  messages: message[];
-}
-
 export type mongoResponse = {
   success: boolean;
-  info: string | user | ticket | message[] | ticketAndMessage;
+  info: string | user | ticket | message[] | fullTicket;
 };

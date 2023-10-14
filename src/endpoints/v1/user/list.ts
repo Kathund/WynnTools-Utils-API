@@ -1,7 +1,8 @@
+import type { mongoResponse } from '../../../../types.d.ts';
 import { errorMessage, apiMessage } from '../../../logger';
 import { Application, Request, Response } from 'express';
+import { getUsers } from '../../../mongo';
 import { apiKey } from '../../../apiKey';
-import { readFileSync } from 'fs';
 
 export default (app: Application) => {
   app.get('/v1/user/list', async (req: Request, res: Response) => {
@@ -13,13 +14,11 @@ export default (app: Application) => {
       );
       return res.status(403).json({ success: false, cause: 'Invalid API-Key' });
     }
-    try {
-      const userData = JSON.parse(readFileSync('userData.json', 'utf8'));
-      const keys = Object.keys(userData);
-      return res.status(200).send({ success: true, info: keys });
-    } catch (error: any) {
-      errorMessage(error);
+    const users = (await getUsers()) as unknown as mongoResponse;
+    if (!users.success) {
+      errorMessage(`Error fetching users: ${users.info}`);
       return res.status(500).send({ success: false, cause: 'Internal Server Error' });
     }
+    return res.status(200).send({ success: true, users: users.info });
   });
 };

@@ -1,4 +1,4 @@
-import type { transcript, mongoResponse } from '../../../../types.d.ts';
+import type { fullTicket, mongoResponse } from '../../../../types.d.ts';
 import { json, Application, Request, Response } from 'express';
 import { errorMessage, apiMessage } from '../../../logger';
 import { getTicket, editTicket } from '../../../mongo';
@@ -23,7 +23,7 @@ export default (app: Application) => {
       if (!ticketId) {
         return res.status(400).send({ success: false, cause: 'No ticket id provided' });
       }
-      const transcript: transcript = req.body;
+      const transcript: fullTicket = req.body;
       if (!transcript) {
         return res.status(400).send({ success: false, cause: 'No transcript provided' });
       }
@@ -31,11 +31,7 @@ export default (app: Application) => {
       if (!ticket.success) {
         return res.status(400).send({ success: false, cause: 'Ticket does not exist' });
       }
-      const editedTicket = (await editTicket(
-        ticketId,
-        transcript.ticket,
-        transcript.messages
-      )) as unknown as mongoResponse;
+      const editedTicket = (await editTicket(ticketId, transcript)) as unknown as mongoResponse;
       if (!editedTicket.success) {
         return res.status(400).send({ success: false, cause: 'Failed to edit ticket' });
       }

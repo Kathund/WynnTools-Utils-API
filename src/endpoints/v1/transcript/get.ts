@@ -27,6 +27,6 @@ export default (app: Application) => {
       errorMessage(`Ticket ${ticketId} does not exist`);
       return res.status(400).send({ success: false, cause: 'Ticket does not exist' });
     }
-    return res.status(200).send({ success: true, cause: 'Ticket fetched', ticket: ticket.info });
+    return res.status(200).send({ success: true, ticket: ticket.info });
   });
 };
