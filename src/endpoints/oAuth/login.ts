@@ -14,6 +14,9 @@ export default (app: Application) => {
         secret: sessionSecret,
         resave: false,
         saveUninitialized: true,
+        cookie: {
+          secure: true,
+        },
       })
     );
 
