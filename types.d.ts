@@ -67,4 +67,5 @@ export interface userResult {
 export type mongoResponse = {
   success: boolean;
   info: string | user | ticket | message[] | fullTicket;
+  error?: string;
 };

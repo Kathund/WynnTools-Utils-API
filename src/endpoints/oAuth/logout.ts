@@ -8,10 +8,14 @@ export default (app: Application) => {
   try {
     app.use(json());
     app.use(
+    app.use(
       session({
         secret: sessionSecret,
         resave: false,
         saveUninitialized: true,
+        cookie: {
+          secure: true,
+        },
       })
     );
 
