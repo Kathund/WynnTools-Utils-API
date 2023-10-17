@@ -10,6 +10,7 @@ export type message = {
   timestamp: number;
   content: string;
   avatar: string;
+  bot: boolean;
 };
 
 export type fullTicket = {

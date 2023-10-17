@@ -1,18 +1,14 @@
 {
-  "env": {
-    "commonjs": true,
-    "es2021": true,
-    "node": true
-  },
-  "plugins": [ "@typescript-eslint" ],
   "extends": [
     "eslint:recommended",
     "plugin:import/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/eslint-recommended"
   ],
-  "overrides": [],
+  "env": { "commonjs": true, "es2021": true, "node": true },
   "parserOptions": { "ecmaVersion": "latest" },
+  "plugins": [ "@typescript-eslint" ],
+  "overrides": [],
   "rules": {
     "no-constant-condition": ["error", { "checkLoops": false }],
     "curly": [ "error", "multi-line", "consistent" ],
