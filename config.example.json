@@ -1,6 +1,5 @@
 {
   "msgSplit": "------------------------------------------------------------",
-  "logsFolder": "../logs",
   "timezone": null,
   "sessionSecret": "SESSION_SECRET_KEY",
   "discord": {
