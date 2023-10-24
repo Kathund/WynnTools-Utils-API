@@ -4,3 +4,4 @@ node_modules/
 tickets/
 logs/
 /userData.json
+dist/

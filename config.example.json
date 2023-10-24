@@ -1,6 +1,5 @@
 {
   "msgSplit": "------------------------------------------------------------",
-  "logsFolder": "../logs",
   "timezone": null,
   "sessionSecret": "SESSION_SECRET_KEY",
   "discord": {
@@ -12,5 +11,8 @@
   "api": {
     "key": "API_KEY",
     "PORT": 1337
+  },
+  "mongo": {
+    "url": "MONGO_DB_URL"
   }
 }
