@@ -20,7 +20,7 @@
     "express-mongo-sanitize": "^2.2.0",
     "express-session": "^1.17.3",
     "mongo-sanitize": "^1.1.0",
-    "mongoose": "^7.6.1",
+    "mongoose": "^8.0.0",
     "undici": "^5.25.4",
     "winston": "^3.10.0"
   },
