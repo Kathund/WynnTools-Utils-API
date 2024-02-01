@@ -1,3 +1,9 @@
+# Archived Notice
+
+This is now archived due to [this pull request](https://github.com/wynntools/WynnTools-Utils/pull/12) that remvoes the need of an api the bridges the connection from the ticket system to the ticket website
+
+
+
 # WynnTools-Utils-API
 
 ### Description
